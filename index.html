@@ -10,262 +10,316 @@
 <style>
 :root{
   box-sizing:border-box;
-  --bg:#eef1f4;
-  --card:#ffffff;
-  --bar:#15191e;
-  --bar-ink:#f2f5f8;
-  --bar-ink-2:#9aa6b2;
-  --ink:#1a2129;
-  --ink-2:#55626e;
-  --ink-3:#8795a2;
-  --line:#e3e8ed;
+  --bg:#eceff2;
+  --card:#fff;
+  --bar:#101519;
+  --bar-2:#2a3137;
+  --bar-ink:#f1f4f6;
+  --bar-dim:#94a1ac;
+  --ink:#121a21;
+  --ink-2:#4e5d69;
+  --ink-3:#83929e;
+  --line:#e0e6ea;
   --line-2:#eef1f4;
-  --warn:#fdf0cd;
-  --warn-line:#f0dba0;
-  --warn-ink:#6b5208;
-  --go:#2563eb;
-  --live:#17a673;
+  --soft:#f8fafb;
+  --teal:#0e7a70;
+  --teal-bg:#dff3f0;
+  --amber:#fdf0cd;
+  --amber-line:#efd9a0;
+  --amber-ink:#6a5107;
+  --red:#b3341a;
+  --red-bg:#fcebe6;
+  --red-line:#f2cabe;
+  --go:#0e7a70;
   --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
 }
 *,*::before,*::after{box-sizing:inherit}
-html,body{margin:0;background:var(--bg);color:var(--ink);height:100%}
+html,body{margin:0;background:var(--bg);color:var(--ink);min-height:100%}
 body{font-family:var(--sans);font-size:15px;line-height:1.5;
-     -webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;
-     display:flex;flex-direction:column;min-height:100%}
-:focus-visible{outline:2px solid var(--go);outline-offset:2px;border-radius:4px}
-button{font-family:inherit}
+  -webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
+:focus-visible{outline:2px solid var(--teal);outline-offset:2px;border-radius:4px}
+button,input,select{font-family:inherit}
 
-/* ═══ top bar ═══ */
-.bar{
-  background:var(--bar);color:var(--bar-ink);
-  padding:calc(env(safe-area-inset-top,0px) + 13px) 20px 13px;
-  display:flex;align-items:center;gap:18px;flex-wrap:wrap;
-}
-.unit{display:flex;align-items:center;gap:13px;flex:none}
-.logo{font-size:18px;font-weight:700;letter-spacing:-.02em}
-.logo b{color:var(--live);font-weight:700}
-.vdiv{width:1px;height:26px;background:#2d343c;flex:none}
-.unit .u{font-size:17px;font-weight:650;letter-spacing:-.01em}
-.who{min-width:0}
-.who .p{font-size:15px;font-weight:600;line-height:1.3}
-.who .s{font-family:var(--mono);font-size:11.5px;color:var(--bar-ink-2);letter-spacing:.02em}
-.bar .sp{margin-left:auto}
-.dest{text-align:right;line-height:1.3}
-.dest .l{font-size:11.5px;color:var(--bar-ink-2)}
-.dest .v{font-size:14.5px;font-weight:600}
-.sig{
-  display:inline-flex;align-items:center;gap:8px;flex:none;
-  background:#fdf4d6;color:#6b5208;border-radius:999px;
-  padding:8px 15px;font-size:13px;font-weight:650;cursor:pointer;border:0;
-}
-.sig[data-state="good"]{background:#d9f5e8;color:#0d6a48}
-.sig[data-state="lost"]{background:#fadbd4;color:#8f2d16}
+/* ═══ bar ═══ */
+.bar{background:var(--bar);color:var(--bar-ink);
+  padding:calc(env(safe-area-inset-top,0px) + 12px) 20px 12px;
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.logo{font-size:18px;font-weight:700;letter-spacing:-.02em;flex:none}
+.logo b{color:#3fd3b8}
+.vd{width:1px;height:26px;background:var(--bar-2);flex:none}
+.who{min-width:0;flex:1 1 170px}
+.who .p{font-size:15px;font-weight:650;line-height:1.25;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.who .s{font-family:var(--mono);font-size:11px;color:var(--bar-dim);letter-spacing:.03em}
+.dest{text-align:right;line-height:1.25;flex:none}
+.dest .l{font-size:11px;color:var(--bar-dim)}
+.dest .v{font-size:14px;font-weight:650}
+.sig{display:inline-flex;align-items:center;gap:8px;flex:none;border:0;cursor:pointer;
+  background:#d9f3ea;color:#0b5c48;border-radius:999px;padding:8px 14px;
+  font-size:12.5px;font-weight:650}
+.sig[data-state="weak"]{background:#fdf0cd;color:var(--amber-ink)}
+.sig[data-state="lost"]{background:#fadbd3;color:#8a2d15}
 .sig .bars{display:flex;align-items:flex-end;gap:2px;height:12px}
-.sig .bars i{width:3px;background:currentColor;border-radius:1px;opacity:.3}
-.sig .bars i:nth-child(1){height:4px}
-.sig .bars i:nth-child(2){height:7px}
-.sig .bars i:nth-child(3){height:10px}
-.sig .bars i:nth-child(4){height:13px}
+.sig .bars i{width:3px;background:currentColor;border-radius:1px;opacity:.28}
+.sig .bars i:nth-child(1){height:4px}.sig .bars i:nth-child(2){height:7px}
+.sig .bars i:nth-child(3){height:10px}.sig .bars i:nth-child(4){height:13px}
 .sig[data-state="good"] .bars i{opacity:1}
 .sig[data-state="weak"] .bars i:nth-child(-n+2){opacity:1}
 .sig[data-state="lost"] .bars i:nth-child(1){opacity:1}
 
-/* ═══ prediction banner ═══ */
-.predict{
-  background:var(--warn);border-bottom:1px solid var(--warn-line);
-  color:var(--warn-ink);padding:12px 20px;
-  display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:14.5px;
-}
-.predict .ic{flex:none;width:17px;height:17px;border:2px solid currentColor;
-  border-radius:50%;position:relative}
-.predict .ic::after{content:"";position:absolute;left:50%;top:3px;width:1.5px;height:5px;
-  background:currentColor;transform-origin:bottom}
-.predict b{font-weight:650}
+/* ═══ setup strip ═══ */
+.setup{background:#1b2227;color:var(--bar-ink);padding:11px 20px;
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  border-bottom:1px solid #000}
+.fld{display:flex;align-items:center;gap:7px}
+.fld span{font-size:11px;font-weight:650;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--bar-dim)}
+.setup input,.setup select{background:#2a3137;border:1px solid #39434b;color:#fff;
+  border-radius:7px;height:34px;padding:0 10px;font-size:13.5px}
+.setup input{width:92px}
+.setup input:focus,.setup select:focus{outline:none;border-color:#3fd3b8}
+.tog{display:inline-flex;align-items:center;gap:7px;font-size:13.5px;cursor:pointer;
+  color:var(--bar-ink)}
+.tog input{width:auto;height:auto;accent-color:#3fd3b8}
+
+/* ═══ alert banner ═══ */
+.alertbar{padding:11px 20px;font-size:15px;font-weight:650;letter-spacing:.02em;
+  display:flex;align-items:center;gap:11px;background:var(--red-bg);color:var(--red);
+  border-bottom:1px solid var(--red-line)}
+.alertbar .pulse{width:9px;height:9px;border-radius:50%;background:currentColor;
+  animation:pz 1.2s ease-in-out infinite}
+@keyframes pz{50%{opacity:.25}}
+.alertbar .note{margin-left:auto;font-weight:400;font-size:13px;opacity:.85}
+
+.predict{background:var(--amber);border-bottom:1px solid var(--amber-line);
+  color:var(--amber-ink);padding:11px 20px;display:flex;align-items:center;gap:11px;
+  flex-wrap:wrap;font-size:14.5px}
 .predict .src{margin-left:auto;font-size:12.5px;opacity:.72}
 
 /* ═══ layout ═══ */
-.work{
-  flex:1;padding:20px;display:grid;gap:18px;
-  grid-template-columns:1fr;align-items:start;
-  max-width:1420px;margin:0 auto;width:100%;
-}
-@media (min-width:940px){ .work{grid-template-columns:minmax(300px,0.78fr) minmax(0,1.22fr)} }
+.work{padding:18px 20px 40px;display:grid;gap:17px;grid-template-columns:1fr;
+  align-items:start;max-width:1460px;margin:0 auto}
+@media (min-width:980px){ .work{grid-template-columns:minmax(290px,.72fr) minmax(0,1.28fr)} }
 
-.card{background:var(--card);border-radius:14px;border:1px solid var(--line);
-      display:flex;flex-direction:column;overflow:hidden}
-.card-head{padding:18px 20px 15px;border-bottom:1px solid var(--line-2)}
-.card-head h2{margin:0;font-size:18px;font-weight:650;letter-spacing:-.015em}
-.card-head p{margin:3px 0 0;font-size:13.5px;color:var(--ink-3)}
-.card-head .tag{float:right;font-size:12px;font-weight:600;color:var(--ink-2);
-  background:var(--bg);border-radius:999px;padding:5px 12px;margin-top:-2px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+  overflow:hidden;display:flex;flex-direction:column}
+.chead{padding:16px 19px 14px;border-bottom:1px solid var(--line-2);
+  display:flex;align-items:flex-start;gap:12px}
+.chead h2{margin:0;font-size:17px;font-weight:650;letter-spacing:-.015em}
+.chead p{margin:2px 0 0;font-size:13px;color:var(--ink-3)}
+.chead .tag{margin-left:auto;flex:none;font-size:11.5px;font-weight:650;
+  color:var(--ink-2);background:var(--bg);border-radius:999px;padding:5px 12px}
+.chead .tag.ok{background:var(--teal-bg);color:#0b5c48}
+.chead .tag.held{background:var(--amber);color:var(--amber-ink)}
 
-/* ═══ notes log ═══ */
-.log{padding:8px 0;min-height:260px;flex:1}
-.log .n{display:grid;grid-template-columns:52px 1fr;gap:12px;
-        padding:9px 20px;align-items:baseline}
-.log .n .t{font-family:var(--mono);font-size:13px;color:var(--ink-3)}
+/* notes */
+.log{padding:7px 0;min-height:230px;max-height:420px;overflow-y:auto;flex:1}
+.log .n{display:grid;grid-template-columns:48px 1fr auto;gap:11px;padding:8px 19px;
+  align-items:baseline}
+.log .n:hover{background:var(--soft)}
+.log .n .t{font-family:var(--mono);font-size:12.5px;color:var(--ink-3)}
 .log .n .x{font-size:15px;word-break:break-word}
-.log .none{padding:40px 20px;text-align:center;color:var(--ink-3);font-size:14px}
+.log .n .del{border:0;background:none;color:var(--ink-3);cursor:pointer;font-size:17px;
+  line-height:1;padding:0 2px;opacity:0}
+.log .n:hover .del{opacity:1}
+.log .none{padding:46px 20px;text-align:center;color:var(--ink-3);font-size:14px}
 
-.add{padding:16px 20px;border-top:1px solid var(--line-2);background:#fafbfc}
-.add label{display:block;font-size:13.5px;font-weight:650;margin-bottom:8px}
-.add .r{display:flex;gap:9px}
-.add input{
-  flex:1;min-width:0;border:1px solid var(--line);border-radius:9px;
-  padding:0 14px;height:48px;font-family:var(--sans);font-size:15px;
-  background:#fff;color:var(--ink);
-}
-.add input::placeholder{color:var(--ink-3)}
-.add input:focus{outline:none;border-color:var(--go)}
-.add button{
-  height:48px;padding:0 20px;border-radius:9px;border:0;cursor:pointer;
-  background:var(--bar);color:#fff;font-size:15px;font-weight:650;flex:none;
-}
-.add button.sec{background:#fff;color:var(--ink-2);border:1px solid var(--line);
-                padding:0 15px}
-.add button:disabled{opacity:.4;cursor:default}
+.add{padding:15px 19px;border-top:1px solid var(--line-2);background:var(--soft)}
+.add label{display:block;font-size:12px;font-weight:650;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink-2);margin-bottom:8px}
+.add .r{display:flex;gap:8px}
+.add input{flex:1;min-width:0;border:1px solid var(--line);border-radius:9px;
+  padding:0 13px;height:46px;font-size:15px;background:#fff;color:var(--ink)}
+.add input:focus{outline:none;border-color:var(--teal)}
+.add .r button{height:46px;padding:0 17px;border-radius:9px;border:0;cursor:pointer;
+  background:var(--bar);color:#fff;font-size:14.5px;font-weight:650;flex:none}
+.add .r button.sec{background:#fff;color:var(--ink-2);border:1px solid var(--line);
+  padding:0 13px}
 
-/* ═══ report ═══ */
-.mist{flex:1}
-.blk{display:grid;grid-template-columns:34px 1fr;gap:15px;
-     padding:18px 20px;border-bottom:1px solid var(--line-2)}
-.badge{width:34px;height:34px;border-radius:9px;background:var(--bar);color:#fff;
-  display:grid;place-items:center;font-size:15px;font-weight:700;flex:none}
-.blk h3{margin:0 0 5px;font-size:12.5px;font-weight:650;letter-spacing:.07em;
-        text-transform:uppercase;color:var(--ink-2)}
-.blk .body{font-size:15.5px;line-height:1.55}
-.blk .body.empty{color:var(--ink-3);font-style:italic;font-size:14px}
-.tline{display:grid;grid-template-columns:52px 1fr;gap:12px;margin-bottom:5px}
-.tline .t{font-family:var(--mono);font-size:13.5px;color:var(--ink-2)}
+/* tabs */
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--line);background:var(--soft)}
+.tab{flex:1;padding:13px 8px;border:0;background:none;cursor:pointer;
+  font-size:13px;font-weight:650;letter-spacing:.03em;color:var(--ink-3);
+  border-bottom:2px solid transparent;display:flex;align-items:center;
+  justify-content:center;gap:7px}
+.tab:hover{color:var(--ink-2)}
+.tab.on{color:var(--ink);border-bottom-color:var(--teal);background:#fff}
+.tab .ct{font-family:var(--mono);font-size:11px;padding:1px 6px;border-radius:999px;
+  background:var(--bg);color:var(--ink-2)}
+.tab .ct.warn{background:var(--amber);color:var(--amber-ink)}
+.pane{display:none}
+.pane.on{display:block}
 
-table{width:100%;border-collapse:collapse;margin-top:3px;
-      background:#fafbfc;border-radius:9px;overflow:hidden}
-th{font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.09em;
-   text-transform:uppercase;color:var(--ink-3);text-align:left;
-   padding:9px 11px;border-bottom:1px solid var(--line)}
-td{font-family:var(--mono);font-size:14px;padding:10px 11px;
-   border-bottom:1px solid var(--line-2);background:#fff}
+/* script */
+.script{padding:22px 24px;font-size:19px;line-height:1.72;min-height:220px}
+.script.empty{color:var(--ink-3);font-style:italic;font-size:15px;
+  display:grid;place-items:center;text-align:center}
+.script .lead{display:inline-block;background:var(--red-bg);color:var(--red);
+  font-weight:700;padding:1px 9px;border-radius:6px;margin-right:4px}
+.scriptbar{padding:11px 20px;background:var(--soft);border-top:1px solid var(--line-2);
+  display:flex;align-items:center;gap:13px;font-size:12.5px;color:var(--ink-3)}
+.scriptbar .cp{margin-left:auto;border:1px solid var(--line);background:#fff;
+  color:var(--ink-2);border-radius:8px;padding:7px 13px;font-size:13px;
+  font-weight:650;cursor:pointer}
+
+/* structured */
+.blk{display:grid;grid-template-columns:148px 1fr;gap:16px;padding:13px 20px;
+  border-bottom:1px solid var(--line-2)}
+.blk:last-child{border-bottom:0}
+.blk .k{font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--ink-3);padding-top:3px}
+.blk .v{font-size:15.5px;line-height:1.55}
+.blk .v.empty{color:var(--ink-3);font-style:italic;font-size:13.5px}
+.tline{display:grid;grid-template-columns:48px 1fr;gap:11px;margin-bottom:4px}
+.tline .t{font-family:var(--mono);font-size:13px;color:var(--ink-2)}
+
+table{width:100%;border-collapse:collapse;border-radius:9px;overflow:hidden;
+  border:1px solid var(--line)}
+th{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink-3);text-align:left;padding:8px 10px;
+  background:var(--soft);border-bottom:1px solid var(--line)}
+td{font-family:var(--mono);font-size:13.5px;padding:9px 10px;
+  border-bottom:1px solid var(--line-2)}
 tr:last-child td{border-bottom:0}
 td:first-child{font-weight:600}
 .dash{color:var(--ink-3)}
+.trend{font-size:11px;margin-left:5px}
+.trend.up{color:var(--red)}
+.trend.dn{color:var(--teal)}
 
-.gaps{padding:15px 20px;display:flex;align-items:flex-start;gap:11px;flex-wrap:wrap}
-.chip{background:var(--warn);color:var(--warn-ink);border-radius:7px;
-      padding:4px 11px;font-size:12.5px;font-weight:650;flex:none}
-.gaps .ls{font-size:14px;color:var(--ink-2);padding-top:2px}
+/* checklist */
+.checks{padding:8px 0}
+.ck{display:grid;grid-template-columns:26px 1fr;gap:12px;padding:13px 20px;
+  border-bottom:1px solid var(--line-2);align-items:start}
+.ck:last-child{border-bottom:0}
+.ck .mk{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;
+  font-size:13px;font-weight:700;margin-top:1px}
+.ck.has .mk{background:var(--teal-bg);color:#0b5c48}
+.ck.miss .mk{background:var(--amber);color:var(--amber-ink)}
+.ck .nm{font-size:15px;font-weight:600}
+.ck .wy{font-size:13px;color:var(--ink-3);margin-top:2px}
+.ck.has .wy{color:var(--teal)}
+.ckhead{padding:14px 20px 4px;font-size:12px;font-weight:650;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink-3)}
 
-.foot{
-  padding:16px 20px;border-top:1px solid var(--line);background:#fafbfc;
-  display:flex;align-items:center;gap:13px;flex-wrap:wrap;
-}
-.foot .disc{font-size:12.5px;color:var(--ink-3);line-height:1.45;flex:1;min-width:200px}
-.btn{height:50px;padding:0 24px;border-radius:10px;border:0;cursor:pointer;
-     font-size:15.5px;font-weight:650;flex:none}
+.foot{padding:15px 20px;border-top:1px solid var(--line);background:var(--soft);
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.foot .disc{font-size:12px;color:var(--ink-3);line-height:1.45;flex:1;min-width:190px}
+.btn{height:48px;padding:0 22px;border-radius:10px;border:0;cursor:pointer;
+  font-size:15px;font-weight:650;flex:none}
 .btn.go{background:var(--go);color:#fff}
 .btn.sec{background:#fff;color:var(--ink);border:1px solid var(--line)}
-.btn:disabled{opacity:.4;cursor:default}
+.btn:disabled{opacity:.38;cursor:default}
 
-.err{margin:0 20px 16px;color:#8f2d16;background:#fdeae6;border:1px solid #f3c9bf;
-     border-radius:9px;padding:11px 14px;font-size:14px}
+.err{margin:0 20px 15px;color:var(--red);background:var(--red-bg);
+  border:1px solid var(--red-line);border-radius:9px;padding:11px 14px;font-size:14px}
 
-/* ═══ sent list ═══ */
-.sent{padding:12px 20px 18px}
-.sent h3{margin:0 0 10px;font-size:12px;font-weight:650;letter-spacing:.07em;
-         text-transform:uppercase;color:var(--ink-3)}
-.srec{display:flex;align-items:center;gap:11px;padding:11px 13px;margin-bottom:8px;
-      border:1px solid var(--line);border-left:3px solid #e0a32e;border-radius:9px;
-      font-size:14px}
-.srec.ok{border-left-color:var(--live)}
-.srec .st{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--ink-3);
-          letter-spacing:.04em;text-transform:uppercase}
-.srec.ok .st{color:var(--live)}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.tx{padding:11px 19px 17px}
+.tx h3{margin:0 0 9px;font-size:11.5px;font-weight:650;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--ink-3)}
+.rec{display:flex;align-items:center;gap:11px;padding:10px 13px;margin-bottom:7px;
+  border:1px solid var(--line);border-left:3px solid #d9a52b;border-radius:9px;font-size:14px}
+.rec.ok{border-left-color:var(--teal)}
+.rec .st{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--ink-3);
+  letter-spacing:.04em;text-transform:uppercase}
+.rec.ok .st{color:var(--teal)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
 </style>
 </head>
 <body>
 
 <header class="bar">
-  <div class="unit">
-    <span class="logo">ER<b>relay</b></span>
-    <span class="vdiv"></span>
-    <span class="u" id="unitName">Medic 14</span>
-  </div>
-  <span class="vdiv"></span>
+  <span class="logo">ER<b>relay</b></span>
+  <span class="vd"></span>
   <div class="who">
     <div class="p" id="whoP">No patient yet</div>
-    <div class="s" id="whoS">Report started —</div>
+    <div class="s" id="whoS">Report not started</div>
   </div>
-  <span class="sp"></span>
   <div class="dest">
     <div class="l">Sending to</div>
     <div class="v" id="destV">Receiving ED</div>
   </div>
   <button class="sig" id="sig" data-state="good" type="button">
     <span class="bars"><i></i><i></i><i></i><i></i></span>
-    <span id="sigText">LTE · strong</span>
+    <span id="sigText">Radio · strong</span>
   </button>
 </header>
 
+<div class="setup">
+  <div class="fld"><span>Unit</span><input id="fUnit" value="Blair 810" autocomplete="off"></div>
+  <div class="fld"><span>Code</span>
+    <select id="fCode">
+      <option>Code 1</option><option selected>Code 2</option><option>Code 3</option>
+    </select></div>
+  <div class="fld"><span>Alert</span>
+    <select id="fAlert">
+      <option value="">None</option>
+      <option value="STROKE ALERT">Stroke</option>
+      <option value="STEMI ALERT">STEMI</option>
+      <option value="TRAUMA ALERT">Trauma</option>
+    </select></div>
+  <label class="tog"><input type="checkbox" id="fPed"> Pediatric (Broselow)</label>
+  <div class="fld"><span>ETA</span><input id="fEta" placeholder="13 min" autocomplete="off"></div>
+</div>
+
+<div class="alertbar" id="alertbar" hidden>
+  <span class="pulse"></span><span id="alertText">STROKE ALERT</span>
+  <span class="note">Lead with the alert · aim for 15–20 min before arrival</span>
+</div>
+
 <div class="predict" id="predict" hidden>
-  <span class="ic"></span>
-  <span><b id="predictMain">Signal drop predicted in about 8 seconds.</b>
-        <span id="predictSub">Approve now to send before the gap.</span></span>
-  <span class="src">Prediction from signal readings</span>
+  <span><b id="predictMain">Signal weakening.</b> <span id="predictSub">Send now if the report is ready.</span></span>
+  <span class="src">Placeholder for failure-prediction model</span>
 </div>
 
 <main class="work">
 
-  <!-- ── left: notes ── -->
+  <!-- left -->
   <section class="card">
-    <div class="card-head">
-      <h2>Field notes</h2>
-      <p>Type short fragments. Any order works.</p>
+    <div class="chead">
+      <div><h2>Field notes</h2><p>Short fragments, any order.</p></div>
+      <span class="tag" id="noteCt">0 notes</span>
     </div>
-    <div class="log" id="log">
-      <p class="none">No notes yet. Add the first one below.</p>
-    </div>
+    <div class="log" id="log"><p class="none">No notes yet.</p></div>
     <div class="add">
       <label for="noteIn">Add a note</label>
       <div class="r">
         <input id="noteIn" type="text" autocomplete="off" spellcheck="false"
-               placeholder="e.g. glucose 112">
-        <button class="sec" id="demoBtn" type="button" title="Load a sample call">Demo</button>
+               placeholder="e.g. sugar 150">
+        <button class="sec" id="demoBtn" type="button">Demo</button>
         <button id="addBtn" type="button">Add</button>
       </div>
     </div>
   </section>
 
-  <!-- ── right: report ── -->
+  <!-- right -->
   <section class="card">
-    <div class="card-head">
-      <span class="tag" id="statusTag">Draft · not sent</span>
-      <h2>Hospital report</h2>
-      <p>ED pre-arrival format (MIST) · built from your notes only</p>
+    <div class="chead">
+      <div><h2>Radio report</h2><p>Blair 810 field order · built from your notes only</p></div>
+      <span class="tag" id="statusTag">Draft</span>
     </div>
 
-    <div class="mist" id="mist">
-      <div class="blk">
-        <span class="badge">M</span>
-        <div><h3>Medical complaint</h3>
-             <div class="body empty" id="bM">Add notes, then build the report.</div></div>
+    <div class="tabs">
+      <button class="tab on" data-p="script" type="button">Script</button>
+      <button class="tab"    data-p="struct" type="button">Structured</button>
+      <button class="tab"    data-p="check"  type="button">Completeness
+        <span class="ct" id="ckCount">—</span></button>
+    </div>
+
+    <div class="pane on" id="p-script">
+      <div class="script empty" id="script">Add notes, then build the report.</div>
+      <div class="scriptbar">
+        <span>Read this aloud. Roughly <b id="secs">0</b>s spoken.</span>
+        <button class="cp" id="copyBtn" type="button">Copy</button>
       </div>
-      <div class="blk">
-        <span class="badge">I</span>
-        <div><h3>Information / history</h3>
-             <div class="body empty" id="bI">—</div></div>
-      </div>
-      <div class="blk">
-        <span class="badge">S</span>
-        <div><h3>Signs / vitals</h3>
-             <div class="body empty" id="bS">—</div></div>
-      </div>
-      <div class="blk">
-        <span class="badge">T</span>
-        <div><h3>Treatment given</h3>
-             <div class="body empty" id="bT">—</div></div>
-      </div>
-      <div class="gaps" id="gaps" hidden></div>
+    </div>
+
+    <div class="pane" id="p-struct"><div id="struct"></div></div>
+
+    <div class="pane" id="p-check">
+      <div class="ckhead">Things the ED commonly asks for afterward</div>
+      <div class="checks" id="checks"></div>
     </div>
 
     <div class="err" id="err" hidden></div>
@@ -277,258 +331,339 @@ td:first-child{font-weight:600}
       <button class="btn go" id="sendBtn" type="button" disabled>Approve &amp; send</button>
     </div>
 
-    <div class="sent" id="sentWrap" hidden>
-      <h3>Transmissions</h3>
-      <div id="sentList"></div>
+    <div class="tx" id="txWrap" hidden>
+      <h3>Transmissions</h3><div id="txList"></div>
     </div>
   </section>
-
 </main>
 
 <script>
 (function(){
 "use strict";
+var $=function(i){return document.getElementById(i)};
 
-var notes=[], report=null, sentLog=[], sigState="good", simLost=false;
+var notes=[], report=null, txLog=[], sigState="good", started=null;
 
-var $=function(id){ return document.getElementById(id); };
 var log=$("log"), noteIn=$("noteIn"), addBtn=$("addBtn"), demoBtn=$("demoBtn"),
-    buildBtn=$("buildBtn"), sendBtn=$("sendBtn"), errBox=$("err"),
-    sig=$("sig"), sigText=$("sigText"), predict=$("predict"),
-    statusTag=$("statusTag"), gaps=$("gaps"), sentWrap=$("sentWrap"),
-    sentList=$("sentList"), whoP=$("whoP"), whoS=$("whoS");
+    buildBtn=$("buildBtn"), sendBtn=$("sendBtn"), errBox=$("err"), sig=$("sig"),
+    sigText=$("sigText"), predict=$("predict"), alertbar=$("alertbar"),
+    statusTag=$("statusTag"), noteCt=$("noteCt"), ckCount=$("ckCount"),
+    scriptEl=$("script"), structEl=$("struct"), checksEl=$("checks"),
+    secsEl=$("secs"), txWrap=$("txWrap"), txList=$("txList"),
+    whoP=$("whoP"), whoS=$("whoS"), destV=$("destV");
 
-var startedAt=null;
+function hhmm(d){d=d||new Date();var h=d.getHours(),m=d.getMinutes();
+  return (h<10?"0":"")+h+":"+(m<10?"0":"")+m}
 
-function hhmm(d){
-  d=d||new Date();
-  var h=d.getHours(), m=d.getMinutes();
-  return (h<10?"0":"")+h+":"+(m<10?"0":"")+m;
-}
+/* ── tabs ── */
+Array.prototype.forEach.call(document.querySelectorAll(".tab"),function(t){
+  t.addEventListener("click",function(){
+    Array.prototype.forEach.call(document.querySelectorAll(".tab"),function(x){
+      x.classList.remove("on")});
+    Array.prototype.forEach.call(document.querySelectorAll(".pane"),function(x){
+      x.classList.remove("on")});
+    t.classList.add("on");
+    $("p-"+t.dataset.p).classList.add("on");
+  });
+});
+
+/* ── alert ── */
+$("fAlert").addEventListener("change",function(){
+  var v=this.value;
+  alertbar.hidden=!v;
+  if(v) $("alertText").textContent=v;
+  if(report) paintScript(report);
+});
 
 /* ── signal ── */
-function online(){ return navigator.onLine && sigState!=="lost"; }
+function online(){return navigator.onLine && sigState!=="lost"}
 function setSig(s){
-  sigState=s;
-  sig.dataset.state=s;
-  sigText.textContent = s==="good" ? "LTE · strong"
-                      : s==="weak" ? "LTE · weakening" : "No signal";
-  predict.hidden = (s!=="weak");
-  if(s==="lost"){
-    $("predictMain").textContent="Connection lost.";
-    $("predictSub").textContent="Reports are held and sent when signal returns.";
+  sigState=s; sig.dataset.state=s;
+  sigText.textContent = s==="good"?"Radio · strong":s==="weak"?"Radio · weak":"No signal";
+  if(s==="weak"){
+    $("predictMain").textContent="Signal weakening.";
+    $("predictSub").textContent="Send now if the report is ready.";
     predict.hidden=false;
-  }
-  sendBtn.textContent = online() ? "Approve & send" : "Approve & hold";
-  if(online()) flushSent();
+  }else if(s==="lost"){
+    $("predictMain").textContent="No radio contact.";
+    $("predictSub").textContent="Report held. Backup: hospital phone line.";
+    predict.hidden=false;
+  }else predict.hidden=true;
+  sendBtn.textContent = online()?"Approve & send":"Approve & hold";
+  if(online()) flushTx();
 }
 sig.addEventListener("click",function(){
-  setSig(sigState==="good" ? "weak" : sigState==="weak" ? "lost" : "good");
-});
-window.addEventListener("online", function(){ setSig("good"); });
-window.addEventListener("offline",function(){ setSig("lost"); });
+  setSig(sigState==="good"?"weak":sigState==="weak"?"lost":"good")});
+window.addEventListener("online",function(){setSig("good")});
+window.addEventListener("offline",function(){setSig("lost")});
 
 /* ── notes ── */
 function paintLog(){
+  noteCt.textContent=notes.length+(notes.length===1?" note":" notes");
   log.innerHTML="";
   if(!notes.length){
-    var p=document.createElement("p");
-    p.className="none"; p.textContent="No notes yet. Add the first one below.";
-    log.appendChild(p); return;
+    var p=document.createElement("p");p.className="none";p.textContent="No notes yet.";
+    log.appendChild(p);return;
   }
-  notes.forEach(function(n){
-    var row=document.createElement("div"); row.className="n";
-    var t=document.createElement("span"); t.className="t"; t.textContent=n.t;
-    var x=document.createElement("span"); x.className="x"; x.textContent=n.x;
-    row.appendChild(t); row.appendChild(x); log.appendChild(row);
+  notes.forEach(function(n,i){
+    var row=document.createElement("div");row.className="n";
+    var t=document.createElement("span");t.className="t";t.textContent=n.t;
+    var x=document.createElement("span");x.className="x";x.textContent=n.x;
+    var d=document.createElement("button");d.className="del";d.type="button";
+    d.textContent="×";d.title="Remove";
+    d.addEventListener("click",function(){notes.splice(i,1);paintLog()});
+    row.appendChild(t);row.appendChild(x);row.appendChild(d);log.appendChild(row);
   });
   log.scrollTop=log.scrollHeight;
 }
-
-function addNote(text){
-  text=(text||"").trim();
-  if(!text) return;
-  if(!startedAt){ startedAt=new Date(); whoS.textContent="Report started "+hhmm(startedAt); }
-  notes.push({ t:hhmm(), x:text });
-  paintLog();
+function addNote(x){
+  x=(x||"").trim(); if(!x) return;
+  if(!started){started=new Date();whoS.textContent="Report started "+hhmm(started)}
+  notes.push({t:hhmm(),x:x}); paintLog();
 }
-
-addBtn.addEventListener("click",function(){
-  addNote(noteIn.value); noteIn.value=""; noteIn.focus();
-});
+addBtn.addEventListener("click",function(){addNote(noteIn.value);noteIn.value="";noteIn.focus()});
 noteIn.addEventListener("keydown",function(e){
-  if(e.key==="Enter"){ e.preventDefault(); addBtn.click(); }
-});
+  if(e.key==="Enter"){e.preventDefault();addBtn.click()}});
 
 demoBtn.addEventListener("click",function(){
-  var sample=[
-    "64 m chest pain 40 min, at rest",
-    "bp 152/94 hr 104 rr 20 spo2 94",
-    "pressure, goes to L arm",
-    "hx htn, takes lisinopril, allergic pcn",
-    "asa 324 po",
-    "o2 2L nc",
-    "12 lead done, sent",
-    "bp 138/88 hr 96 spo2 97 gcs 15"
-  ];
-  notes=[]; startedAt=new Date();
-  whoS.textContent="Report started "+hhmm(startedAt);
-  var base=startedAt.getTime();
-  sample.forEach(function(s,i){
-    notes.push({ t:hhmm(new Date(base + i*60000)), x:s });
-  });
+  var s=["81 f right hip pain, unwitnessed fall approx 30 min ago",
+         "coming from care facility",
+         "alert but confused, hx dementia and stroke",
+         "csm intact right leg, no rotation or shortening",
+         "takes blood thinners",
+         "pelvic binder and c-collar applied",
+         "pulse 74 spo2 94 ra bp 148/96 sugar 150"];
+  notes=[];started=new Date();whoS.textContent="Report started "+hhmm(started);
+  var b=started.getTime();
+  s.forEach(function(x,i){notes.push({t:hhmm(new Date(b+i*60000)),x:x})});
+  $("fEta").value="13 min";
   paintLog();
 });
 
-/* ── render report ── */
-function clearReport(){
-  report=null;
-  ["M","I","S","T"].forEach(function(k){
-    var el=$("b"+k);
-    el.className="body empty";
-    el.textContent = k==="M" ? "Add notes, then build the report." : "—";
-  });
-  gaps.hidden=true; gaps.innerHTML="";
-  sendBtn.disabled=true;
-  statusTag.textContent="Draft · not sent";
+/* ── render: script ── */
+function paintScript(d){
+  scriptEl.innerHTML="";
+  var body=(d.script||"").trim();
+  if(!body){
+    scriptEl.className="script empty";
+    scriptEl.textContent="Add notes, then build the report.";
+    secsEl.textContent="0"; return;
+  }
+  scriptEl.className="script";
+  var al=$("fAlert").value;
+  if(al){
+    var lead=document.createElement("span");
+    lead.className="lead"; lead.textContent=al;
+    scriptEl.appendChild(lead);
+  }
+  scriptEl.appendChild(document.createTextNode(body));
+  var words=(al?al.split(/\s+/).length:0)+body.split(/\s+/).length;
+  secsEl.textContent=Math.max(1,Math.round(words/2.8));
 }
 
-function setText(id,val,fallback){
-  var el=$(id);
-  el.innerHTML="";
-  if(val && String(val).trim()){
-    el.className="body"; el.textContent=String(val).trim();
-  }else{
-    el.className="body empty"; el.textContent=fallback||"Not entered";
-  }
-}
+$("copyBtn").addEventListener("click",function(){
+  var al=$("fAlert").value;
+  var txt=(al?al+". ":"")+((report&&report.script)||"");
+  if(!txt.trim()) return;
+  navigator.clipboard && navigator.clipboard.writeText(txt);
+  this.textContent="Copied"; var b=this;
+  setTimeout(function(){b.textContent="Copy"},1400);
+});
 
-function renderVitals(rows){
-  var el=$("bS"); el.innerHTML="";
-  if(!rows || !rows.length){
-    el.className="body empty"; el.textContent="Not entered"; return;
-  }
-  el.className="body";
-  var cols=[["time","Time"],["bp","BP"],["hr","HR"],["rr","RR"],
-            ["spo2","SpO2"],["gcs","GCS"],["glucose","Glucose"]];
-  var tb=document.createElement("table");
-  var thead=document.createElement("thead"), tr=document.createElement("tr");
-  cols.forEach(function(c){
-    var th=document.createElement("th"); th.textContent=c[1]; tr.appendChild(th);
-  });
-  thead.appendChild(tr); tb.appendChild(thead);
-  var tbody=document.createElement("tbody");
-  rows.forEach(function(r){
-    var row=document.createElement("tr");
+/* ── render: structured ── */
+var ORDER=[
+  ["unit","Unit / code"],
+  ["patient","Age / sex"],
+  ["mentalStatus","Mental status"],
+  ["origin","Dispatch origin"],
+  ["complaint","Complaint / onset"],
+  ["findings","Assessment findings"],
+  ["priorMeds","Meds before arrival"],
+  ["treatment","Treatment given"],
+  ["vitals","Vitals"],
+  ["broselow","Broselow"],
+  ["eta","ETA"]
+];
+
+function row(label,build){
+  var b=document.createElement("div");b.className="blk";
+  var k=document.createElement("div");k.className="k";k.textContent=label;
+  var v=document.createElement("div");v.className="v";
+  build(v);
+  b.appendChild(k);b.appendChild(v);return b;
+}
+function txt(v,s){
+  if(s&&String(s).trim()){v.textContent=String(s).trim()}
+  else{v.className="v empty";v.textContent="Not entered"}
+}
+function vitalsTable(v,rows){
+  if(!rows||!rows.length){v.className="v empty";v.textContent="Not entered";return}
+  var cols=[["time","Time"],["bp","BP"],["hr","HR"],["rr","RR"],["spo2","SpO2"],
+            ["gcs","GCS"],["glucose","Glucose"],["temp","Temp"]];
+  var t=document.createElement("table");
+  var hr=document.createElement("tr");
+  cols.forEach(function(c){var th=document.createElement("th");th.textContent=c[1];
+    hr.appendChild(th)});
+  var th2=document.createElement("thead");th2.appendChild(hr);t.appendChild(th2);
+  var tb=document.createElement("tbody");
+  rows.forEach(function(r,ri){
+    var tr=document.createElement("tr");
     cols.forEach(function(c){
       var td=document.createElement("td");
-      var v=r[c[0]];
-      if(v && String(v).trim()){ td.textContent=String(v).trim(); }
-      else { td.textContent="—"; td.className="dash"; }
-      row.appendChild(td);
+      var val=r[c[0]];
+      if(val&&String(val).trim()){
+        td.textContent=String(val).trim();
+        if(ri>0 && (c[0]==="hr"||c[0]==="spo2")){
+          var prev=parseFloat(rows[ri-1][c[0]]), cur=parseFloat(val);
+          if(!isNaN(prev)&&!isNaN(cur)&&prev!==cur){
+            var s=document.createElement("span");
+            s.className="trend "+(cur>prev?"up":"dn");
+            s.textContent=cur>prev?"▲":"▼";
+            td.appendChild(s);
+          }
+        }
+      }else{td.textContent="—";td.className="dash"}
+      tr.appendChild(td);
     });
-    tbody.appendChild(row);
+    tb.appendChild(tr);
   });
-  tb.appendChild(tbody); el.appendChild(tb);
+  t.appendChild(tb);v.appendChild(t);
 }
-
-function renderTreatment(items){
-  var el=$("bT"); el.innerHTML="";
-  if(!items || !items.length){
-    el.className="body empty"; el.textContent="Not entered"; return;
-  }
-  el.className="body";
+function treatList(v,items){
+  if(!items||!items.length){v.className="v empty";v.textContent="Not entered";return}
   items.forEach(function(it){
-    var row=document.createElement("div"); row.className="tline";
-    var t=document.createElement("span"); t.className="t";
-    t.textContent=(it.time && it.time.trim()) ? it.time.trim() : "—";
-    var x=document.createElement("span"); x.textContent=it.text||"";
-    row.appendChild(t); row.appendChild(x); el.appendChild(row);
+    var r=document.createElement("div");r.className="tline";
+    var t=document.createElement("span");t.className="t";
+    t.textContent=(it.time&&it.time.trim())||"—";
+    var x=document.createElement("span");x.textContent=it.text||"";
+    r.appendChild(t);r.appendChild(x);v.appendChild(r);
   });
 }
 
-function renderGaps(list){
-  gaps.innerHTML="";
-  if(!list || !list.length){ gaps.hidden=true; return; }
-  gaps.hidden=false;
-  var chip=document.createElement("span");
-  chip.className="chip"; chip.textContent="Not entered";
-  var ls=document.createElement("span");
-  ls.className="ls"; ls.textContent=list.join(" · ");
-  gaps.appendChild(chip); gaps.appendChild(ls);
+function paintStruct(d){
+  structEl.innerHTML="";
+  ORDER.forEach(function(f){
+    var key=f[0], label=f[1];
+    if(key==="broselow" && !$("fPed").checked) return;
+    structEl.appendChild(row(label,function(v){
+      if(key==="vitals") vitalsTable(v,d.vitals);
+      else if(key==="treatment") treatList(v,d.treatment);
+      else if(key==="unit") txt(v,($("fUnit").value+" · "+$("fCode").value));
+      else if(key==="eta") txt(v,$("fEta").value||d.eta);
+      else txt(v,d[key]);
+    }));
+  });
 }
 
-function renderReport(d){
+/* ── render: completeness ── */
+var CHECKS=[
+  ["gcs","GCS","Often requested when not reported"],
+  ["glucose","Blood sugar","Often requested even when normal"],
+  ["homeO2","Home oxygen","Baseline the ED asks about"],
+  ["allergies","Allergies","Reported at bedside handoff"],
+  ["medList","Full medication list","Reported at bedside handoff"],
+  ["mentalStatus","Mental status","Part of the standard report"],
+  ["origin","Dispatch origin","Part of the standard report"],
+  ["eta","ETA","Part of the standard report"]
+];
+
+function paintChecks(d){
+  checksEl.innerHTML="";
+  var vit=d.vitals||[];
+  var any=function(k){return vit.some(function(r){return r[k]&&String(r[k]).trim()})};
+  var state={
+    gcs:any("gcs"),
+    glucose:any("glucose"),
+    homeO2:!!(d.homeOxygen&&d.homeOxygen.trim()),
+    allergies:!!(d.allergies&&d.allergies.trim()),
+    medList:!!(d.priorMeds&&d.priorMeds.trim()),
+    mentalStatus:!!(d.mentalStatus&&d.mentalStatus.trim()),
+    origin:!!(d.origin&&d.origin.trim()),
+    eta:!!($("fEta").value.trim()||(d.eta&&d.eta.trim()))
+  };
+  var missing=0;
+  CHECKS.forEach(function(c){
+    var has=state[c[0]];
+    if(!has) missing++;
+    var el=document.createElement("div");
+    el.className="ck "+(has?"has":"miss");
+    var mk=document.createElement("span");mk.className="mk";mk.textContent=has?"✓":"!";
+    var bd=document.createElement("div");
+    var nm=document.createElement("div");nm.className="nm";nm.textContent=c[1];
+    var wy=document.createElement("div");wy.className="wy";
+    wy.textContent=has?"Included":c[2];
+    bd.appendChild(nm);bd.appendChild(wy);
+    el.appendChild(mk);el.appendChild(bd);checksEl.appendChild(el);
+  });
+  ckCount.textContent=missing?missing+" missing":"all";
+  ckCount.className="ct"+(missing?" warn":"");
+}
+
+function renderAll(d){
   report=d;
-  setText("bM", d.complaint, "Not entered");
-  setText("bI", d.history,   "Not entered");
-  renderVitals(d.vitals);
-  renderTreatment(d.treatment);
-  renderGaps(d.notEntered);
-  if(d.patient && d.patient.trim()) whoP.textContent=d.patient.trim();
-  if(d.destination && d.destination.trim()) $("destV").textContent=d.destination.trim();
+  if(d.patient&&d.patient.trim()) whoP.textContent=d.patient.trim();
+  if(d.destination&&d.destination.trim()) destV.textContent=d.destination.trim();
+  paintScript(d); paintStruct(d); paintChecks(d);
   sendBtn.disabled=false;
-  statusTag.textContent="Draft · not sent";
+  statusTag.textContent="Draft"; statusTag.className="tag";
 }
 
 /* ── build ── */
-function showErr(m){ errBox.textContent=m; errBox.hidden=false; }
-function hideErr(){ errBox.hidden=true; }
+function showErr(m){errBox.textContent=m;errBox.hidden=false}
+function hideErr(){errBox.hidden=true}
 
-buildBtn.addEventListener("click", async function(){
+buildBtn.addEventListener("click",async function(){
   hideErr();
-  if(!notes.length){ showErr("Add some notes first."); return; }
-  if(!online()){ showErr("No signal. Building the report needs a connection."); return; }
-
-  buildBtn.disabled=true; buildBtn.textContent="Building…";
+  if(!notes.length){showErr("Add some notes first.");return}
+  if(!online()){showErr("No signal. Building the report needs a connection.");return}
+  buildBtn.disabled=true;buildBtn.textContent="Building…";
   try{
-    var text=notes.map(function(n){ return n.t+"  "+n.x; }).join("\n");
-    var res=await fetch("/api/format",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({ notes:text })
-    });
+    var body={
+      notes: notes.map(function(n){return n.t+"  "+n.x}).join("\n"),
+      unit: $("fUnit").value, code: $("fCode").value,
+      alert: $("fAlert").value, eta: $("fEta").value,
+      pediatric: $("fPed").checked
+    };
+    var res=await fetch("/api/format",{method:"POST",
+      headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
     if(!res.ok) throw new Error("status "+res.status);
-    renderReport(await res.json());
+    renderAll(await res.json());
   }catch(e){
     showErr("Could not build the report. Check the connection and try again.");
   }finally{
-    buildBtn.disabled=false; buildBtn.textContent="Build report";
+    buildBtn.disabled=false;buildBtn.textContent="Build report";
   }
 });
 
 /* ── send ── */
-function paintSent(){
-  if(!sentLog.length){ sentWrap.hidden=true; return; }
-  sentWrap.hidden=false;
-  sentList.innerHTML="";
-  sentLog.slice().reverse().forEach(function(s){
-    var el=document.createElement("div");
-    el.className="srec"+(s.sent?" ok":"");
-    var n=document.createElement("span"); n.textContent=s.label;
-    var st=document.createElement("span"); st.className="st";
-    st.textContent=s.sent ? "Sent "+s.at : "Held since "+s.at;
-    el.appendChild(n); el.appendChild(st);
-    sentList.appendChild(el);
+function paintTx(){
+  if(!txLog.length){txWrap.hidden=true;return}
+  txWrap.hidden=false;txList.innerHTML="";
+  txLog.slice().reverse().forEach(function(r){
+    var el=document.createElement("div");el.className="rec"+(r.sent?" ok":"");
+    var n=document.createElement("span");n.textContent=r.label;
+    var st=document.createElement("span");st.className="st";
+    st.textContent=(r.sent?"Sent ":"Held since ")+r.at;
+    el.appendChild(n);el.appendChild(st);txList.appendChild(el);
   });
 }
-function flushSent(){
+function flushTx(){
   var ch=false;
-  sentLog.forEach(function(s){ if(!s.sent){ s.sent=true; s.at=hhmm(); ch=true; } });
-  if(ch) paintSent();
+  txLog.forEach(function(r){if(!r.sent){r.sent=true;r.at=hhmm();ch=true}});
+  if(ch){paintTx();
+    statusTag.textContent="Sent "+hhmm();statusTag.className="tag ok"}
 }
-
 sendBtn.addEventListener("click",function(){
   if(!report) return;
-  var label=(report.patient && report.patient.trim()) || "Report";
-  var rec={ label:label, at:hhmm(), sent:online() };
-  sentLog.push(rec);
-  statusTag.textContent = online() ? "Sent "+rec.at : "Held · will send on signal";
-  sendBtn.disabled=true;
-  paintSent();
+  var up=online();
+  txLog.push({label:(report.patient||"Report")+" · "+$("fUnit").value,
+              at:hhmm(),sent:up});
+  statusTag.textContent=up?"Sent "+hhmm():"Held";
+  statusTag.className="tag "+(up?"ok":"held");
+  sendBtn.disabled=true; paintTx();
 });
 
-clearReport(); paintLog(); setSig("good");
+paintLog(); setSig("good");
 })();
 </script>
 </body>
