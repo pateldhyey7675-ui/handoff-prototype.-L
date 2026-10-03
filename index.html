@@ -4,162 +4,350 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pre-Arrival Handoff</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    box-sizing:border-box;
-    padding-top:env(safe-area-inset-top,0px);
-    padding-bottom:env(safe-area-inset-bottom,0px);
-    --bg:#10161c; --panel:#19222b; --panel-2:#212d38; --line:#2e3d4b;
-    --ink:#eef4f8; --ink-dim:#93a6b5;
-    --live:#3fbf7f; --held:#e0a32e; --down:#e2603f;
-    --tap:56px;
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+
+  --bg:#090e14;
+  --rail:#0d141c;
+  --surface:#121b25;
+  --surface-2:#18242f;
+  --surface-3:#1f2d3a;
+  --line:#243442;
+  --line-soft:#1b2832;
+  --ink:#f4f8fb;
+  --ink-2:#a9b8c4;
+  --ink-3:#6f8292;
+
+  --live:#3ddc97;
+  --live-bg:#06291c;
+  --held:#f2b134;
+  --held-bg:#2b1f05;
+  --down:#f2543d;
+  --down-bg:#2b0f0a;
+  --accent:#55a8f5;
+
+  --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --tap:56px;
+  --r:14px;
+  --r-sm:9px;
+}
+:root:not([data-theme="dark"]){
+  --bg:#eff3f6; --rail:#e4eaef; --surface:#fff; --surface-2:#f4f7f9; --surface-3:#e9eef2;
+  --line:#d3dce3; --line-soft:#e5ebef;
+  --ink:#0b1620; --ink-2:#465866; --ink-3:#6e8090;
+  --live:#0f8c58; --live-bg:#e2f7ed;
+  --held:#8f6202; --held-bg:#fdf3dc;
+  --down:#c0392100; --down:#be3b20; --down-bg:#fdeae6;
+  --accent:#1a6cb5;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#090e14; --rail:#0d141c; --surface:#121b25; --surface-2:#18242f; --surface-3:#1f2d3a;
+    --line:#243442; --line-soft:#1b2832;
+    --ink:#f4f8fb; --ink-2:#a9b8c4; --ink-3:#6f8292;
+    --live:#3ddc97; --live-bg:#06291c;
+    --held:#f2b134; --held-bg:#2b1f05;
+    --down:#f2543d; --down-bg:#2b0f0a;
+    --accent:#55a8f5;
   }
-  :root:not([data-theme="dark"]){
-    --bg:#eef2f5; --panel:#fff; --panel-2:#f3f6f8; --line:#cfd9e0;
-    --ink:#15202a; --ink-dim:#5a6b78;
-  }
-  @media (prefers-color-scheme:dark){
-    :root:not([data-theme="light"]){
-      --bg:#10161c;--panel:#19222b;--panel-2:#212d38;--line:#2e3d4b;
-      --ink:#eef4f8;--ink-dim:#93a6b5;
-    }
-  }
-  *,*::before,*::after{box-sizing:inherit}
-  html,body{margin:0;background:var(--bg);color:var(--ink)}
-  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
-       font-size:17px;line-height:1.45;-webkit-text-size-adjust:100%}
-  .wrap{max-width:640px;margin:0 auto;padding:0 16px 40px}
+}
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font-family:var(--sans);font-size:16px;line-height:1.5;
+     -webkit-text-size-adjust:100%;-webkit-font-smoothing:antialiased}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:5px}
 
-  .conn{position:sticky;top:0;z-index:20;margin:0 -16px 20px;
-    padding:calc(env(safe-area-inset-top,0px) + 12px) 16px 12px;
-    display:flex;align-items:center;gap:10px;background:var(--panel);
-    border-bottom:1px solid var(--line);font-size:15px;font-weight:600}
-  .dot{width:11px;height:11px;border-radius:50%;background:var(--live);flex:none}
-  .conn[data-state="down"] .dot{background:var(--down)}
-  .conn[data-state="down"]{color:var(--down)}
-  .conn .spacer{margin-left:auto}
-  .sim{font:inherit;font-size:13px;font-weight:600;background:none;
-    border:1px solid var(--line);color:var(--ink-dim);padding:7px 12px;
-    border-radius:7px;cursor:pointer;min-height:38px}
-  .sim:hover{color:var(--ink)}
-  :focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+/* ══ top bar ═══════════════════════════════════════ */
+.topbar{
+  position:sticky;top:0;z-index:40;
+  background:var(--rail);
+  border-bottom:1px solid var(--line);
+  padding:calc(env(safe-area-inset-top,0px) + 12px) 20px 12px;
+}
+.topbar-in{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:14px}
+.mark{
+  width:32px;height:32px;border-radius:9px;flex:none;
+  background:linear-gradient(145deg,var(--live),#1f9e6d);
+  display:grid;place-items:center;
+  font-family:var(--mono);font-size:15px;font-weight:600;color:var(--live-bg);
+}
+:root:not([data-theme="dark"]) .mark{color:#fff}
+.brand{display:flex;flex-direction:column;line-height:1.15}
+.brand .n{font-size:15px;font-weight:650;letter-spacing:-.01em}
+.brand .t{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;
+          text-transform:uppercase;color:var(--ink-3)}
+.topbar .sp{margin-left:auto}
 
-  h1{font-size:21px;font-weight:650;margin:4px 0 2px;letter-spacing:-.01em}
-  .sub{color:var(--ink-dim);font-size:15px;margin:0 0 22px}
-  label{display:block;font-size:15px;font-weight:600;margin-bottom:7px}
-  .hint{font-weight:400;color:var(--ink-dim);font-size:14px;margin-bottom:9px}
-  textarea{width:100%;min-height:150px;resize:vertical;background:var(--panel);
-    color:var(--ink);border:1px solid var(--line);border-radius:10px;
-    padding:13px;font:inherit;line-height:1.5}
-  textarea::placeholder{color:var(--ink-dim)}
+.pill{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:7px 13px 7px 11px;border-radius:999px;
+  font-size:12.5px;font-weight:650;letter-spacing:.04em;text-transform:uppercase;
+  background:var(--live-bg);color:var(--live);
+  border:1px solid color-mix(in srgb,var(--live) 30%,transparent);
+}
+.pill[data-state="down"]{background:var(--down-bg);color:var(--down);
+  border-color:color-mix(in srgb,var(--down) 32%,transparent)}
+.pill .dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex:none}
+.pill[data-state="down"] .dot{animation:blip 1.1s ease-in-out infinite}
+@keyframes blip{50%{opacity:.25}}
 
-  .row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
-  button.act{flex:1 1 auto;min-height:var(--tap);min-width:150px;font:inherit;
-    font-size:17px;font-weight:650;border-radius:11px;border:1px solid transparent;
-    cursor:pointer;background:var(--ink);color:var(--bg);padding:0 18px}
-  button.act.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
-  button.act.go{background:var(--live);color:#06210f}
-  button.act:disabled{opacity:.45;cursor:default}
+.sim{
+  font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.07em;
+  text-transform:uppercase;background:transparent;border:1px solid var(--line);
+  color:var(--ink-3);padding:8px 11px;border-radius:8px;cursor:pointer;
+  transition:color .12s,border-color .12s;
+}
+.sim:hover{color:var(--ink);border-color:var(--ink-3)}
 
-  .report{margin-top:22px;background:var(--panel);border:1px solid var(--line);
-    border-radius:12px;overflow:hidden}
-  .report h2{margin:0;padding:13px 16px;font-size:15px;font-weight:650;
-    border-bottom:1px solid var(--line);background:var(--panel-2)}
-  .field{padding:13px 16px;border-bottom:1px solid var(--line)}
-  .field:last-of-type{border-bottom:0}
-  .k{font-size:13px;font-weight:650;color:var(--ink-dim);margin-bottom:3px}
-  .v{white-space:pre-wrap;min-height:1.45em}
-  .gap{color:var(--held);font-style:italic}
+/* ══ steps ═════════════════════════════════════════ */
+.steps{
+  background:var(--surface);border-bottom:1px solid var(--line);
+  padding:0 20px;
+}
+.steps-in{max-width:1180px;margin:0 auto;display:flex;gap:0}
+.step{
+  flex:1;padding:13px 4px 12px;display:flex;align-items:center;gap:9px;
+  font-size:12.5px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;
+  color:var(--ink-3);border-bottom:2px solid transparent;
+  transition:color .18s,border-color .18s;
+}
+.step .num{
+  width:21px;height:21px;border-radius:50%;flex:none;display:grid;place-items:center;
+  font-family:var(--mono);font-size:11px;font-weight:600;
+  border:1.5px solid currentColor;
+}
+.step.on{color:var(--ink);border-bottom-color:var(--live)}
+.step.done{color:var(--live)}
+.step.done .num{background:var(--live);color:var(--live-bg);border-color:var(--live)}
+:root:not([data-theme="dark"]) .step.done .num{color:#fff}
 
-  .queue{margin-top:30px}
-  .queue h2{font-size:15px;font-weight:650;margin:0 0 10px}
-  .item{background:var(--panel);border:1px solid var(--line);
-    border-left:4px solid var(--held);border-radius:9px;padding:12px 14px;
-    margin-bottom:9px;display:flex;align-items:center;gap:12px;font-size:15px}
-  .item.sent{border-left-color:var(--live)}
-  .who{font-weight:600}
-  .st{margin-left:auto;font-size:13px;color:var(--ink-dim);text-align:right;flex:none}
-  .empty{color:var(--ink-dim);font-size:15px}
-  .err{color:var(--down);font-size:15px;margin-top:12px}
-  .note{margin-top:32px;padding-top:16px;border-top:1px solid var(--line);
-    color:var(--ink-dim);font-size:14px;line-height:1.55}
+/* ══ layout ════════════════════════════════════════ */
+.shell{max-width:1180px;margin:0 auto;padding:26px 20px 64px;
+       display:grid;gap:24px;grid-template-columns:1fr}
+@media (min-width:1000px){
+  .shell{grid-template-columns:minmax(0,1fr) 340px;align-items:start}
+  .side{position:sticky;top:150px}
+}
+
+section.panel{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  overflow:hidden;
+}
+.panel-head{
+  padding:14px 18px;border-bottom:1px solid var(--line);background:var(--surface-2);
+  display:flex;align-items:center;gap:10px;
+}
+.panel-head h2{margin:0;font-size:12.5px;font-weight:650;letter-spacing:.07em;
+               text-transform:uppercase;color:var(--ink)}
+.panel-head .meta{margin-left:auto;font-family:var(--mono);font-size:11.5px;
+                  color:var(--ink-3);letter-spacing:.04em}
+.panel-body{padding:18px}
+
+/* ══ capture ═══════════════════════════════════════ */
+textarea{
+  width:100%;min-height:190px;resize:vertical;display:block;
+  background:var(--bg);color:var(--ink);
+  border:1px solid var(--line);border-radius:var(--r-sm);
+  padding:15px 16px;font-family:var(--mono);font-size:14.5px;line-height:1.7;
+  transition:border-color .14s;
+}
+textarea:focus{border-color:var(--accent);outline:none}
+textarea::placeholder{color:var(--ink-3);opacity:.7}
+
+.row{display:flex;gap:11px;margin-top:15px;flex-wrap:wrap}
+button.act{
+  flex:1 1 auto;min-height:var(--tap);min-width:150px;
+  font-family:var(--sans);font-size:15.5px;font-weight:650;
+  border-radius:var(--r-sm);border:1px solid transparent;cursor:pointer;
+  background:var(--ink);color:var(--bg);padding:0 20px;
+  transition:transform .07s,opacity .14s;
+}
+button.act:active{transform:translateY(1px)}
+button.act.ghost{background:transparent;color:var(--ink-2);border-color:var(--line);
+                 flex:0 1 128px;min-width:110px}
+button.act.ghost:hover{color:var(--ink);border-color:var(--ink-3)}
+button.act.go{background:var(--live);color:var(--live-bg)}
+:root:not([data-theme="dark"]) button.act.go{color:#fff}
+button.act:disabled{opacity:.38;cursor:default;transform:none}
+
+/* ══ report ════════════════════════════════════════ */
+#reportHost{margin-top:24px}
+.report{animation:rise .22s ease-out}
+@keyframes rise{from{opacity:0;transform:translateY(7px)}}
+.report .panel-head{background:var(--surface-3)}
+.field{
+  padding:14px 18px;border-bottom:1px solid var(--line-soft);
+  display:grid;grid-template-columns:104px minmax(0,1fr);gap:18px;align-items:start;
+}
+.field:last-of-type{border-bottom:0}
+.k{font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.09em;
+   text-transform:uppercase;color:var(--ink-3);padding-top:4px}
+.v{white-space:pre-wrap;min-height:1.5em;font-size:15.5px;line-height:1.6}
+.v[data-key="vitals"],.v[data-key="unit"]{font-family:var(--mono);font-size:14.5px}
+.v.gap{color:var(--held);font-size:13.5px;font-style:italic}
+.v[contenteditable]:focus{outline:2px solid var(--accent);outline-offset:5px}
+.report .row{padding:16px 18px;margin:0;border-top:1px solid var(--line);
+             background:var(--surface-2)}
+
+/* ══ side: queue ═══════════════════════════════════ */
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);
+       border-bottom:1px solid var(--line)}
+.stat{background:var(--surface);padding:14px 16px}
+.stat .n{font-family:var(--mono);font-size:24px;font-weight:600;line-height:1.1;
+         letter-spacing:-.02em}
+.stat .l{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;
+         color:var(--ink-3);margin-top:3px}
+.stat.held .n{color:var(--held)}
+.stat.sent .n{color:var(--live)}
+
+.qlist{padding:12px}
+.item{
+  background:var(--surface-2);border:1px solid var(--line);
+  border-left:3px solid var(--held);border-radius:var(--r-sm);
+  padding:12px 14px;margin-bottom:9px;
+}
+.item:last-child{margin-bottom:0}
+.item.sent{border-left-color:var(--live)}
+.item .who{font-weight:600;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;
+           white-space:nowrap;margin-bottom:5px}
+.item .st{font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+          text-transform:uppercase;color:var(--ink-3);display:flex;align-items:center;gap:6px}
+.item.sent .st{color:var(--live)}
+.item .st .d{width:5px;height:5px;border-radius:50%;background:currentColor}
+.empty{color:var(--ink-3);font-size:14px;padding:26px 16px;text-align:center;
+       border:1px dashed var(--line);border-radius:var(--r-sm);margin:12px}
+
+.err{color:var(--down);font-size:14.5px;margin-top:14px;padding:12px 14px;
+     border:1px solid color-mix(in srgb,var(--down) 34%,transparent);
+     border-radius:var(--r-sm);background:var(--down-bg)}
+
+.note{margin-top:14px;color:var(--ink-3);font-size:12.5px;line-height:1.6;
+      padding:16px 18px;background:var(--surface);border:1px solid var(--line);
+      border-radius:var(--r)}
+.note b{color:var(--ink-2);font-weight:600}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <div class="conn" id="conn" data-state="live">
-    <span class="dot"></span>
-    <span id="connText">Connected</span>
-    <span class="spacer"></span>
-    <button class="sim" id="sim" type="button">Simulate signal loss</button>
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="mark">H</div>
+    <div class="brand">
+      <span class="n">Pre-Arrival Handoff</span>
+      <span class="t">Prehospital → Receiving ED</span>
+    </div>
+    <span class="sp"></span>
+    <button class="sim" id="sim" type="button">Simulate loss</button>
+    <span class="pill" id="pill" data-state="live">
+      <span class="dot"></span><span id="pillText">Connected</span>
+    </span>
   </div>
+</header>
 
-  <h1>Pre-arrival handoff</h1>
-  <p class="sub">Enter what you have. Review before it goes.</p>
+<nav class="steps" aria-label="Progress">
+  <div class="steps-in">
+    <div class="step on" id="s1"><span class="num">1</span>Capture</div>
+    <div class="step"    id="s2"><span class="num">2</span>Review</div>
+    <div class="step"    id="s3"><span class="num">3</span>Transmit</div>
+  </div>
+</nav>
 
-  <label for="raw">Notes from the call</label>
-  <div class="hint">Fragments are fine. Shorthand is fine.</div>
-  <textarea id="raw" placeholder="62F chest pain onset 40 min
+<main class="shell">
+
+  <div>
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Field notes</h2>
+        <span class="meta">shorthand ok</span>
+      </div>
+      <div class="panel-body">
+        <textarea id="raw" spellcheck="false" placeholder="62F chest pain onset 40 min
 BP 90/60 HR 112 RR 22 SpO2 94 RA
 324 ASA given, 2 L NC
 hx CAD, on metoprolol
 ETA 18 min to Methodist"></textarea>
+        <div class="row">
+          <button class="act" id="build" type="button">Build report</button>
+          <button class="act ghost" id="clear" type="button">Clear</button>
+        </div>
+        <div class="err" id="err" hidden></div>
+      </div>
+    </section>
 
-  <div class="row">
-    <button class="act" id="build" type="button">Build report</button>
-    <button class="act ghost" id="clear" type="button">Clear</button>
-  </div>
-  <div class="err" id="err" hidden></div>
-
-  <div id="reportHost"></div>
-
-  <div class="queue">
-    <h2>Reports</h2>
-    <div id="queueHost"><p class="empty">Nothing sent yet.</p></div>
+    <div id="reportHost"></div>
   </div>
 
-  <p class="note">Prototype. This tool organizes what you enter into the receiving
-  hospital's report format. It does not assess, diagnose, or recommend treatment, and
-  nothing is transmitted until you approve it. Report composition requires a connection;
-  approved reports are held and retried if a send fails.</p>
+  <aside class="side">
+    <section class="panel">
+      <div class="panel-head"><h2>Reports</h2></div>
+      <div class="stats">
+        <div class="stat held"><div class="n" id="nHeld">0</div><div class="l">Held</div></div>
+        <div class="stat sent"><div class="n" id="nSent">0</div><div class="l">Sent</div></div>
+      </div>
+      <div id="queueHost"><p class="empty">Nothing sent yet.</p></div>
+    </section>
 
-</div>
+    <p class="note"><b>Prototype.</b> Organizes what you enter into the receiving
+    hospital's format. It does not assess, diagnose, or recommend treatment, and nothing
+    transmits until you approve it. Composition needs a connection; approved reports are
+    held and retried if a send fails.</p>
+  </aside>
+
+</main>
 
 <script>
 (function(){
   "use strict";
 
   var FIELDS = [
-    ["unit","Unit and ETA"],
+    ["unit","Unit / ETA"],
     ["patient","Patient"],
-    ["mechanism","Mechanism or complaint"],
-    ["history","History and allergies"],
-    ["vitals","Vital signs"],
-    ["treatment","Treatment given"],
-    ["destination","Destination and alerts"]
+    ["mechanism","Complaint"],
+    ["history","History"],
+    ["vitals","Vitals"],
+    ["treatment","Treatment"],
+    ["destination","Destination"]
   ];
 
-  var raw        = document.getElementById("raw");
-  var buildBtn   = document.getElementById("build");
-  var clearBtn   = document.getElementById("clear");
-  var errBox     = document.getElementById("err");
-  var reportHost = document.getElementById("reportHost");
-  var queueHost  = document.getElementById("queueHost");
-  var conn       = document.getElementById("conn");
-  var connText   = document.getElementById("connText");
-  var simBtn     = document.getElementById("sim");
+  var raw=document.getElementById("raw"),
+      buildBtn=document.getElementById("build"),
+      clearBtn=document.getElementById("clear"),
+      errBox=document.getElementById("err"),
+      reportHost=document.getElementById("reportHost"),
+      queueHost=document.getElementById("queueHost"),
+      pill=document.getElementById("pill"),
+      pillText=document.getElementById("pillText"),
+      simBtn=document.getElementById("sim"),
+      nHeld=document.getElementById("nHeld"),
+      nSent=document.getElementById("nSent"),
+      s1=document.getElementById("s1"),
+      s2=document.getElementById("s2"),
+      s3=document.getElementById("s3");
 
-  var simulatedDown = false;
-  var queue = [];
+  var simulatedDown=false, queue=[];
 
   function online(){ return navigator.onLine && !simulatedDown; }
 
+  function setStep(n){
+    [s1,s2,s3].forEach(function(el,i){
+      el.className = "step" + (i+1 < n ? " done" : (i+1 === n ? " on" : ""));
+    });
+  }
+
   function paintConn(){
     var up = online();
-    conn.dataset.state = up ? "live" : "down";
-    connText.textContent = up ? "Connected" : "No signal — reports will be held";
-    simBtn.textContent = simulatedDown ? "Restore signal" : "Simulate signal loss";
+    pill.dataset.state = up ? "live" : "down";
+    pillText.textContent = up ? "Connected" : "No signal";
+    simBtn.textContent = simulatedDown ? "Restore" : "Simulate loss";
   }
   simBtn.addEventListener("click", function(){
     simulatedDown = !simulatedDown; paintConn(); if(online()) flush();
@@ -169,145 +357,159 @@ ETA 18 min to Methodist"></textarea>
 
   function load(){
     try{
-      var s = localStorage.getItem("handoff.queue");
+      var s=localStorage.getItem("handoff.queue");
       queue = s ? JSON.parse(s) : [];
-      if(!Array.isArray(queue)) queue = [];
-    }catch(e){ queue = []; }
+      if(!Array.isArray(queue)) queue=[];
+    }catch(e){ queue=[]; }
   }
   function save(){
     try{ localStorage.setItem("handoff.queue", JSON.stringify(queue)); }catch(e){}
   }
 
   function when(ts){
-    var d = new Date(ts), h = d.getHours(), m = d.getMinutes();
-    var ap = h >= 12 ? "PM" : "AM"; h = h % 12 || 12;
-    return h + ":" + (m < 10 ? "0" : "") + m + " " + ap;
+    var d=new Date(ts), h=d.getHours(), m=d.getMinutes();
+    return (h<10?"0":"")+h+":"+(m<10?"0":"")+m;
   }
 
   function paintQueue(){
-    queueHost.innerHTML = "";
+    var held=0, sent=0;
+    queue.forEach(function(it){ it.sent ? sent++ : held++; });
+    nHeld.textContent=held; nSent.textContent=sent;
+
+    queueHost.innerHTML="";
     if(!queue.length){
-      var p = document.createElement("p");
-      p.className = "empty"; p.textContent = "Nothing sent yet.";
+      var p=document.createElement("p");
+      p.className="empty"; p.textContent="Nothing sent yet.";
       queueHost.appendChild(p); return;
     }
+    var list=document.createElement("div");
+    list.className="qlist";
     queue.slice().reverse().forEach(function(it){
-      var el = document.createElement("div");
-      el.className = "item" + (it.sent ? " sent" : "");
-      var who = document.createElement("span");
-      who.className = "who"; who.textContent = it.label || "Report";
-      var st = document.createElement("span");
-      st.className = "st";
-      st.textContent = it.sent ? "Sent " + when(it.sentAt)
-                               : "Held since " + when(it.createdAt);
+      var el=document.createElement("div");
+      el.className="item"+(it.sent?" sent":"");
+      var who=document.createElement("div");
+      who.className="who"; who.textContent=it.label||"Report";
+      var st=document.createElement("div");
+      st.className="st";
+      var d=document.createElement("span"); d.className="d";
+      var t=document.createElement("span");
+      t.textContent=(it.sent?"Sent ":"Held since ")+when(it.sent?it.sentAt:it.createdAt);
+      st.appendChild(d); st.appendChild(t);
       el.appendChild(who); el.appendChild(st);
-      queueHost.appendChild(el);
+      list.appendChild(el);
     });
+    queueHost.appendChild(list);
   }
 
-  // In a real deployment this would POST to the hospital endpoint.
-  // Here it marks the report as delivered once a connection exists.
   function flush(){
     if(!online()) return;
-    var changed = false;
+    var changed=false;
     queue.forEach(function(it){
-      if(!it.sent){ it.sent = true; it.sentAt = Date.now(); changed = true; }
+      if(!it.sent){ it.sent=true; it.sentAt=Date.now(); changed=true; }
     });
     if(changed){ save(); paintQueue(); }
   }
 
   function renderReport(data){
-    reportHost.innerHTML = "";
-    var box = document.createElement("div");
-    box.className = "report";
+    reportHost.innerHTML="";
+    var box=document.createElement("section");
+    box.className="panel report";
 
-    var h = document.createElement("h2");
-    h.textContent = "Review before sending";
-    box.appendChild(h);
+    var filled=0;
+    FIELDS.forEach(function(f){
+      if(data && data[f[0]] && String(data[f[0]]).trim()) filled++;
+    });
+
+    var head=document.createElement("div");
+    head.className="panel-head";
+    var h=document.createElement("h2"); h.textContent="Review before sending";
+    var c=document.createElement("span"); c.className="meta";
+    c.textContent=filled+" / "+FIELDS.length+" fields";
+    head.appendChild(h); head.appendChild(c);
+    box.appendChild(head);
 
     FIELDS.forEach(function(f){
-      var key = f[0], label = f[1];
-      var wrapEl = document.createElement("div");
-      wrapEl.className = "field";
-      var k = document.createElement("div");
-      k.className = "k"; k.textContent = label;
-      var v = document.createElement("div");
-      v.className = "v";
+      var key=f[0], label=f[1];
+      var wrapEl=document.createElement("div"); wrapEl.className="field";
+      var k=document.createElement("div"); k.className="k"; k.textContent=label;
+      var v=document.createElement("div"); v.className="v";
       v.setAttribute("contenteditable","true");
       v.setAttribute("role","textbox");
       v.setAttribute("aria-label",label);
-      v.dataset.key = key;
-      var val = (data && data[key]) ? String(data[key]).trim() : "";
-      if(val){ v.textContent = val; }
-      else { v.textContent = "not recorded"; v.classList.add("gap"); }
-      v.addEventListener("focus", function(){
-        if(v.classList.contains("gap")){ v.textContent = ""; v.classList.remove("gap"); }
+      v.dataset.key=key;
+      var val=(data && data[key]) ? String(data[key]).trim() : "";
+      if(val){ v.textContent=val; }
+      else { v.textContent="not recorded"; v.classList.add("gap"); }
+      v.addEventListener("focus",function(){
+        if(v.classList.contains("gap")){ v.textContent=""; v.classList.remove("gap"); }
       });
       wrapEl.appendChild(k); wrapEl.appendChild(v);
       box.appendChild(wrapEl);
     });
 
-    var row = document.createElement("div");
-    row.className = "row"; row.style.padding = "14px 16px";
-    var send = document.createElement("button");
-    send.type = "button"; send.className = "act go";
-    send.textContent = online() ? "Approve and send" : "Approve and hold";
-    var discard = document.createElement("button");
-    discard.type = "button"; discard.className = "act ghost";
-    discard.textContent = "Discard";
+    var row=document.createElement("div"); row.className="row";
+    var send=document.createElement("button");
+    send.type="button"; send.className="act go";
+    send.textContent=online()?"Approve and send":"Approve and hold";
+    var discard=document.createElement("button");
+    discard.type="button"; discard.className="act ghost";
+    discard.textContent="Discard";
     row.appendChild(send); row.appendChild(discard);
     box.appendChild(row);
 
-    send.addEventListener("click", function(){
-      var out = {};
+    send.addEventListener("click",function(){
+      var out={};
       box.querySelectorAll(".v").forEach(function(v){
-        out[v.dataset.key] = v.classList.contains("gap") ? "" : v.textContent.trim();
+        out[v.dataset.key]=v.classList.contains("gap")?"":v.textContent.trim();
       });
-      var item = { label: out.patient || "Report", body: out,
-                   createdAt: Date.now(), sent: false };
-      if(online()){ item.sent = true; item.sentAt = Date.now(); }
+      var item={label:out.patient||"Report", body:out,
+                createdAt:Date.now(), sent:false};
+      if(online()){ item.sent=true; item.sentAt=Date.now(); }
       queue.push(item); save(); paintQueue();
-      reportHost.innerHTML = ""; raw.value = "";
+      reportHost.innerHTML=""; raw.value="";
+      setStep(3);
+      setTimeout(function(){ setStep(1); }, 1600);
     });
-    discard.addEventListener("click", function(){ reportHost.innerHTML = ""; });
+    discard.addEventListener("click",function(){
+      reportHost.innerHTML=""; setStep(1);
+    });
 
     reportHost.appendChild(box);
+    setStep(2);
     box.scrollIntoView({behavior:"smooth", block:"nearest"});
   }
 
-  function showErr(m){ errBox.textContent = m; errBox.hidden = false; }
-  function hideErr(){ errBox.hidden = true; }
+  function showErr(m){ errBox.textContent=m; errBox.hidden=false; }
+  function hideErr(){ errBox.hidden=true; }
 
   buildBtn.addEventListener("click", async function(){
-    var text = raw.value.trim();
+    var text=raw.value.trim();
     hideErr();
     if(!text){ showErr("Enter some notes first."); return; }
     if(!online()){ showErr("No connection. Report composition needs a signal."); return; }
 
-    buildBtn.disabled = true;
-    buildBtn.textContent = "Building…";
+    buildBtn.disabled=true; buildBtn.textContent="Building…";
     try{
-      var res = await fetch("/api/format", {
+      var res=await fetch("/api/format",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
-        body: JSON.stringify({ notes: text })
+        body:JSON.stringify({notes:text})
       });
-      if(!res.ok) throw new Error("status " + res.status);
-      var data = await res.json();
-      renderReport(data || {});
+      if(!res.ok) throw new Error("status "+res.status);
+      var data=await res.json();
+      renderReport(data||{});
     }catch(e){
       showErr("Could not build the report. Check the connection and try again.");
     }finally{
-      buildBtn.disabled = false;
-      buildBtn.textContent = "Build report";
+      buildBtn.disabled=false; buildBtn.textContent="Build report";
     }
   });
 
-  clearBtn.addEventListener("click", function(){
-    raw.value = ""; reportHost.innerHTML = ""; hideErr(); raw.focus();
+  clearBtn.addEventListener("click",function(){
+    raw.value=""; reportHost.innerHTML=""; hideErr(); setStep(1); raw.focus();
   });
 
-  load(); paintQueue(); paintConn();
+  load(); paintQueue(); paintConn(); setStep(1);
 })();
 </script>
 </body>
