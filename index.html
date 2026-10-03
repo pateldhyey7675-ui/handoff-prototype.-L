@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pre-Arrival Handoff</title>
+<style>
+  :root{
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+    --bg:#10161c; --panel:#19222b; --panel-2:#212d38; --line:#2e3d4b;
+    --ink:#eef4f8; --ink-dim:#93a6b5;
+    --live:#3fbf7f; --held:#e0a32e; --down:#e2603f;
+    --tap:56px;
+  }
+  :root:not([data-theme="dark"]){
+    --bg:#eef2f5; --panel:#fff; --panel-2:#f3f6f8; --line:#cfd9e0;
+    --ink:#15202a; --ink-dim:#5a6b78;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#10161c;--panel:#19222b;--panel-2:#212d38;--line:#2e3d4b;
+      --ink:#eef4f8;--ink-dim:#93a6b5;
+    }
+  }
+  *,*::before,*::after{box-sizing:inherit}
+  html,body{margin:0;background:var(--bg);color:var(--ink)}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+       font-size:17px;line-height:1.45;-webkit-text-size-adjust:100%}
+  .wrap{max-width:640px;margin:0 auto;padding:0 16px 40px}
+
+  .conn{position:sticky;top:0;z-index:20;margin:0 -16px 20px;
+    padding:calc(env(safe-area-inset-top,0px) + 12px) 16px 12px;
+    display:flex;align-items:center;gap:10px;background:var(--panel);
+    border-bottom:1px solid var(--line);font-size:15px;font-weight:600}
+  .dot{width:11px;height:11px;border-radius:50%;background:var(--live);flex:none}
+  .conn[data-state="down"] .dot{background:var(--down)}
+  .conn[data-state="down"]{color:var(--down)}
+  .conn .spacer{margin-left:auto}
+  .sim{font:inherit;font-size:13px;font-weight:600;background:none;
+    border:1px solid var(--line);color:var(--ink-dim);padding:7px 12px;
+    border-radius:7px;cursor:pointer;min-height:38px}
+  .sim:hover{color:var(--ink)}
+  :focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+  h1{font-size:21px;font-weight:650;margin:4px 0 2px;letter-spacing:-.01em}
+  .sub{color:var(--ink-dim);font-size:15px;margin:0 0 22px}
+  label{display:block;font-size:15px;font-weight:600;margin-bottom:7px}
+  .hint{font-weight:400;color:var(--ink-dim);font-size:14px;margin-bottom:9px}
+  textarea{width:100%;min-height:150px;resize:vertical;background:var(--panel);
+    color:var(--ink);border:1px solid var(--line);border-radius:10px;
+    padding:13px;font:inherit;line-height:1.5}
+  textarea::placeholder{color:var(--ink-dim)}
+
+  .row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+  button.act{flex:1 1 auto;min-height:var(--tap);min-width:150px;font:inherit;
+    font-size:17px;font-weight:650;border-radius:11px;border:1px solid transparent;
+    cursor:pointer;background:var(--ink);color:var(--bg);padding:0 18px}
+  button.act.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+  button.act.go{background:var(--live);color:#06210f}
+  button.act:disabled{opacity:.45;cursor:default}
+
+  .report{margin-top:22px;background:var(--panel);border:1px solid var(--line);
+    border-radius:12px;overflow:hidden}
+  .report h2{margin:0;padding:13px 16px;font-size:15px;font-weight:650;
+    border-bottom:1px solid var(--line);background:var(--panel-2)}
+  .field{padding:13px 16px;border-bottom:1px solid var(--line)}
+  .field:last-of-type{border-bottom:0}
+  .k{font-size:13px;font-weight:650;color:var(--ink-dim);margin-bottom:3px}
+  .v{white-space:pre-wrap;min-height:1.45em}
+  .gap{color:var(--held);font-style:italic}
+
+  .queue{margin-top:30px}
+  .queue h2{font-size:15px;font-weight:650;margin:0 0 10px}
+  .item{background:var(--panel);border:1px solid var(--line);
+    border-left:4px solid var(--held);border-radius:9px;padding:12px 14px;
+    margin-bottom:9px;display:flex;align-items:center;gap:12px;font-size:15px}
+  .item.sent{border-left-color:var(--live)}
+  .who{font-weight:600}
+  .st{margin-left:auto;font-size:13px;color:var(--ink-dim);text-align:right;flex:none}
+  .empty{color:var(--ink-dim);font-size:15px}
+  .err{color:var(--down);font-size:15px;margin-top:12px}
+  .note{margin-top:32px;padding-top:16px;border-top:1px solid var(--line);
+    color:var(--ink-dim);font-size:14px;line-height:1.55}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="conn" id="conn" data-state="live">
+    <span class="dot"></span>
+    <span id="connText">Connected</span>
+    <span class="spacer"></span>
+    <button class="sim" id="sim" type="button">Simulate signal loss</button>
+  </div>
+
+  <h1>Pre-arrival handoff</h1>
+  <p class="sub">Enter what you have. Review before it goes.</p>
+
+  <label for="raw">Notes from the call</label>
+  <div class="hint">Fragments are fine. Shorthand is fine.</div>
+  <textarea id="raw" placeholder="62F chest pain onset 40 min
+BP 90/60 HR 112 RR 22 SpO2 94 RA
+324 ASA given, 2 L NC
+hx CAD, on metoprolol
+ETA 18 min to Methodist"></textarea>
+
+  <div class="row">
+    <button class="act" id="build" type="button">Build report</button>
+    <button class="act ghost" id="clear" type="button">Clear</button>
+  </div>
+  <div class="err" id="err" hidden></div>
+
+  <div id="reportHost"></div>
+
+  <div class="queue">
+    <h2>Reports</h2>
+    <div id="queueHost"><p class="empty">Nothing sent yet.</p></div>
+  </div>
+
+  <p class="note">Prototype. This tool organizes what you enter into the receiving
+  hospital's report format. It does not assess, diagnose, or recommend treatment, and
+  nothing is transmitted until you approve it. Report composition requires a connection;
+  approved reports are held and retried if a send fails.</p>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var FIELDS = [
+    ["unit","Unit and ETA"],
+    ["patient","Patient"],
+    ["mechanism","Mechanism or complaint"],
+    ["history","History and allergies"],
+    ["vitals","Vital signs"],
+    ["treatment","Treatment given"],
+    ["destination","Destination and alerts"]
+  ];
+
+  var raw        = document.getElementById("raw");
+  var buildBtn   = document.getElementById("build");
+  var clearBtn   = document.getElementById("clear");
+  var errBox     = document.getElementById("err");
+  var reportHost = document.getElementById("reportHost");
+  var queueHost  = document.getElementById("queueHost");
+  var conn       = document.getElementById("conn");
+  var connText   = document.getElementById("connText");
+  var simBtn     = document.getElementById("sim");
+
+  var simulatedDown = false;
+  var queue = [];
+
+  function online(){ return navigator.onLine && !simulatedDown; }
+
+  function paintConn(){
+    var up = online();
+    conn.dataset.state = up ? "live" : "down";
+    connText.textContent = up ? "Connected" : "No signal — reports will be held";
+    simBtn.textContent = simulatedDown ? "Restore signal" : "Simulate signal loss";
+  }
+  simBtn.addEventListener("click", function(){
+    simulatedDown = !simulatedDown; paintConn(); if(online()) flush();
+  });
+  window.addEventListener("online",  function(){ paintConn(); flush(); });
+  window.addEventListener("offline", paintConn);
+
+  function load(){
+    try{
+      var s = localStorage.getItem("handoff.queue");
+      queue = s ? JSON.parse(s) : [];
+      if(!Array.isArray(queue)) queue = [];
+    }catch(e){ queue = []; }
+  }
+  function save(){
+    try{ localStorage.setItem("handoff.queue", JSON.stringify(queue)); }catch(e){}
+  }
+
+  function when(ts){
+    var d = new Date(ts), h = d.getHours(), m = d.getMinutes();
+    var ap = h >= 12 ? "PM" : "AM"; h = h % 12 || 12;
+    return h + ":" + (m < 10 ? "0" : "") + m + " " + ap;
+  }
+
+  function paintQueue(){
+    queueHost.innerHTML = "";
+    if(!queue.length){
+      var p = document.createElement("p");
+      p.className = "empty"; p.textContent = "Nothing sent yet.";
+      queueHost.appendChild(p); return;
+    }
+    queue.slice().reverse().forEach(function(it){
+      var el = document.createElement("div");
+      el.className = "item" + (it.sent ? " sent" : "");
+      var who = document.createElement("span");
+      who.className = "who"; who.textContent = it.label || "Report";
+      var st = document.createElement("span");
+      st.className = "st";
+      st.textContent = it.sent ? "Sent " + when(it.sentAt)
+                               : "Held since " + when(it.createdAt);
+      el.appendChild(who); el.appendChild(st);
+      queueHost.appendChild(el);
+    });
+  }
+
+  // In a real deployment this would POST to the hospital endpoint.
+  // Here it marks the report as delivered once a connection exists.
+  function flush(){
+    if(!online()) return;
+    var changed = false;
+    queue.forEach(function(it){
+      if(!it.sent){ it.sent = true; it.sentAt = Date.now(); changed = true; }
+    });
+    if(changed){ save(); paintQueue(); }
+  }
+
+  function renderReport(data){
+    reportHost.innerHTML = "";
+    var box = document.createElement("div");
+    box.className = "report";
+
+    var h = document.createElement("h2");
+    h.textContent = "Review before sending";
+    box.appendChild(h);
+
+    FIELDS.forEach(function(f){
+      var key = f[0], label = f[1];
+      var wrapEl = document.createElement("div");
+      wrapEl.className = "field";
+      var k = document.createElement("div");
+      k.className = "k"; k.textContent = label;
+      var v = document.createElement("div");
+      v.className = "v";
+      v.setAttribute("contenteditable","true");
+      v.setAttribute("role","textbox");
+      v.setAttribute("aria-label",label);
+      v.dataset.key = key;
+      var val = (data && data[key]) ? String(data[key]).trim() : "";
+      if(val){ v.textContent = val; }
+      else { v.textContent = "not recorded"; v.classList.add("gap"); }
+      v.addEventListener("focus", function(){
+        if(v.classList.contains("gap")){ v.textContent = ""; v.classList.remove("gap"); }
+      });
+      wrapEl.appendChild(k); wrapEl.appendChild(v);
+      box.appendChild(wrapEl);
+    });
+
+    var row = document.createElement("div");
+    row.className = "row"; row.style.padding = "14px 16px";
+    var send = document.createElement("button");
+    send.type = "button"; send.className = "act go";
+    send.textContent = online() ? "Approve and send" : "Approve and hold";
+    var discard = document.createElement("button");
+    discard.type = "button"; discard.className = "act ghost";
+    discard.textContent = "Discard";
+    row.appendChild(send); row.appendChild(discard);
+    box.appendChild(row);
+
+    send.addEventListener("click", function(){
+      var out = {};
+      box.querySelectorAll(".v").forEach(function(v){
+        out[v.dataset.key] = v.classList.contains("gap") ? "" : v.textContent.trim();
+      });
+      var item = { label: out.patient || "Report", body: out,
+                   createdAt: Date.now(), sent: false };
+      if(online()){ item.sent = true; item.sentAt = Date.now(); }
+      queue.push(item); save(); paintQueue();
+      reportHost.innerHTML = ""; raw.value = "";
+    });
+    discard.addEventListener("click", function(){ reportHost.innerHTML = ""; });
+
+    reportHost.appendChild(box);
+    box.scrollIntoView({behavior:"smooth", block:"nearest"});
+  }
+
+  function showErr(m){ errBox.textContent = m; errBox.hidden = false; }
+  function hideErr(){ errBox.hidden = true; }
+
+  buildBtn.addEventListener("click", async function(){
+    var text = raw.value.trim();
+    hideErr();
+    if(!text){ showErr("Enter some notes first."); return; }
+    if(!online()){ showErr("No connection. Report composition needs a signal."); return; }
+
+    buildBtn.disabled = true;
+    buildBtn.textContent = "Building…";
+    try{
+      var res = await fetch("/api/format", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ notes: text })
+      });
+      if(!res.ok) throw new Error("status " + res.status);
+      var data = await res.json();
+      renderReport(data || {});
+    }catch(e){
+      showErr("Could not build the report. Check the connection and try again.");
+    }finally{
+      buildBtn.disabled = false;
+      buildBtn.textContent = "Build report";
+    }
+  });
+
+  clearBtn.addEventListener("click", function(){
+    raw.value = ""; reportHost.innerHTML = ""; hideErr(); raw.focus();
+  });
+
+  load(); paintQueue(); paintConn();
+})();
+</script>
+</body>
+</html>
