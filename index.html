@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ERrelay — handoff reporting for rural EMS crews</title>
+<meta name="description" content="ERrelay turns the notes a paramedic takes on a rural transport into the report the receiving ED expects, and flags what's been left out. Free for volunteer and rural services.">
+<link rel="icon" href="/errelay-favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#101519;
+  --ink-2:#44535E;
+  --ink-3:#71828E;
+  --paper:#F6F8F9;
+  --white:#FFFFFF;
+  --rule:#DFE6EA;
+  --rule-dk:#28333C;
+  --teal:#0E7A70;
+  --teal-br:#3FD3B8;
+  --slate:#5E707D;
+  --amber:#F2B134;
+  --amber-ink:#6A5107;
+  --amber-bg:#FDF3DC;
+  --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --measure:62ch;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--sans);font-size:17px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{animation:none!important;transition:none!important}
+}
+a{color:var(--teal)}
+a:hover{color:#0a5a53}
+:focus-visible{outline:2px solid var(--teal);outline-offset:3px;border-radius:3px}
+.shell{max-width:1120px;margin:0 auto;padding:0 28px}
+@media (max-width:600px){ .shell{padding:0 20px} }
+
+/* ── nav ── */
+.nav{border-bottom:1px solid var(--rule);background:var(--paper)}
+.nav .shell{display:flex;align-items:center;gap:26px;height:74px}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--ink)}
+.brand span{font-size:19px;font-weight:700;letter-spacing:-.02em}
+.brand span i{font-style:normal;font-weight:400}
+.nav .sp{margin-left:auto}
+.nav a.lnk{color:var(--ink-2);text-decoration:none;font-size:15.5px;font-weight:500}
+.nav a.lnk:hover{color:var(--ink)}
+@media (max-width:620px){ .nav a.lnk{display:none} }
+
+/* ── buttons ── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-height:50px;padding:0 24px;border-radius:10px;
+  font-size:16px;font-weight:600;text-decoration:none;border:1px solid transparent;
+  background:var(--teal);color:#fff;
+}
+.btn:hover{background:#0a5f57;color:#fff}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--rule)}
+.btn.ghost:hover{background:var(--white);color:var(--ink);border-color:var(--ink-3)}
+.btn.sm{min-height:42px;padding:0 18px;font-size:15px}
+
+/* ── hero ── */
+.hero{padding:74px 0 64px}
+.hero .shell{display:grid;gap:56px;grid-template-columns:1fr;align-items:center}
+@media (min-width:940px){
+  .hero .shell{grid-template-columns:minmax(0,1fr) minmax(0,1.04fr);gap:64px}
+}
+h1{
+  margin:0 0 22px;font-size:clamp(34px,4.6vw,54px);line-height:1.08;
+  letter-spacing:-.033em;font-weight:700;max-width:16ch;
+}
+.lede{margin:0 0 30px;font-size:19px;line-height:1.58;color:var(--ink-2);max-width:48ch}
+.cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.free{margin:16px 0 0;font-size:14.5px;color:var(--ink-3)}
+
+/* ── the demo panel: the product's own surface ── */
+.demo{
+  background:var(--ink);border-radius:16px;overflow:hidden;
+  box-shadow:0 2px 4px rgba(16,21,25,.1),0 24px 48px -28px rgba(16,21,25,.45);
+}
+.demo-head{
+  padding:14px 20px;border-bottom:1px solid var(--rule-dk);
+  display:flex;align-items:center;gap:10px;
+  font-size:12.5px;font-weight:600;color:#8A9BA7;
+}
+.demo-head b{color:#E8EEF2;font-weight:600}
+.demo-head .eta{margin-left:auto;font-family:var(--mono);font-weight:400}
+.notes{padding:16px 20px 18px}
+.notes .n{display:grid;grid-template-columns:52px 1fr;gap:12px;padding:3px 0}
+.notes .t{font-family:var(--mono);font-size:12.5px;color:#6F8292}
+.notes .x{font-family:var(--mono);font-size:13.5px;color:#C6D2DA;line-height:1.5}
+
+.seam{display:flex;align-items:center;gap:14px;padding:4px 20px 0}
+.seam .ln{height:1px;background:var(--rule-dk);flex:1}
+.script{padding:16px 20px 22px}
+.script p{
+  margin:0;font-size:16px;line-height:1.66;color:#F2F5F7;
+}
+.script .q{color:var(--teal-br)}
+.gapline{
+  margin:14px 20px 20px;padding:10px 13px;border-radius:9px;
+  background:#2B1F05;border:1px solid #5A4512;
+  font-size:13.5px;color:#F2B134;display:flex;gap:9px;align-items:baseline;
+}
+.gapline b{font-weight:600;flex:none}
+
+/* ── sections ── */
+section{padding:66px 0;border-top:1px solid var(--rule)}
+h2{
+  margin:0 0 18px;font-size:clamp(25px,3vw,33px);line-height:1.2;
+  letter-spacing:-.025em;font-weight:700;max-width:22ch;
+}
+.prose{max-width:var(--measure)}
+.prose p{margin:0 0 17px;color:var(--ink-2);font-size:17.5px}
+.prose p:last-child{margin-bottom:0}
+.prose strong{color:var(--ink);font-weight:600}
+
+/* three things — rules, not cards */
+.does{display:grid;gap:0;margin-top:34px;max-width:860px}
+.does .row{
+  display:grid;gap:14px 26px;grid-template-columns:1fr;
+  padding:26px 0;border-top:1px solid var(--rule);
+}
+.does .row:last-child{border-bottom:1px solid var(--rule)}
+@media (min-width:760px){ .does .row{grid-template-columns:232px minmax(0,1fr)} }
+.does h3{margin:0;font-size:18px;font-weight:650;letter-spacing:-.012em}
+.does p{margin:0;color:var(--ink-2);font-size:16.5px}
+.does .eg{
+  margin-top:11px;font-family:var(--mono);font-size:13.5px;color:var(--ink-3);
+  background:var(--white);border:1px solid var(--rule);border-radius:8px;
+  padding:10px 13px;line-height:1.55;
+}
+.does .eg em{font-style:normal;color:var(--teal)}
+
+/* won't do */
+.wont{background:var(--white);border:1px solid var(--rule);border-radius:14px;
+      padding:30px 32px;margin-top:30px;max-width:720px}
+.wont ul{margin:0;padding:0;list-style:none}
+.wont li{padding:13px 0;border-bottom:1px solid var(--rule);font-size:16.5px;color:var(--ink-2)}
+.wont li:last-child{border-bottom:0;padding-bottom:0}
+.wont li:first-child{padding-top:0}
+.wont li b{color:var(--ink);font-weight:600}
+
+/* status */
+.status{display:grid;gap:26px;grid-template-columns:1fr;max-width:860px;margin-top:30px}
+@media (min-width:720px){ .status{grid-template-columns:1fr 1fr;gap:40px} }
+.status h3{margin:0 0 9px;font-size:16.5px;font-weight:650}
+.status p{margin:0;color:var(--ink-2);font-size:16.5px}
+
+/* closing */
+.close{background:var(--ink);color:#F2F5F7;border-top:0}
+.close h2{color:#fff;max-width:20ch}
+.close p{color:#A9B8C4;font-size:17.5px;max-width:52ch;margin:0 0 28px}
+.close .btn.ghost{color:#F2F5F7;border-color:#2F3B45}
+.close .btn.ghost:hover{background:#1A232B;color:#fff;border-color:#4A5862}
+
+footer{padding:34px 0 48px;background:var(--ink);color:#6F8292;font-size:14.5px}
+footer .shell{display:flex;gap:18px;flex-wrap:wrap;align-items:center}
+footer a{color:#93A5B1}
+footer .sp{margin-left:auto}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="shell">
+    <a class="brand" href="/">
+      <svg viewBox="0 0 84 64" width="34" height="26" role="img" aria-label="ERrelay">
+        <g fill="none" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6,15 22,32 6,49" stroke="#101519"/>
+          <polyline points="22,15 38,32 22,49" stroke="#101519"/>
+          <polyline points="62,15 78,32 62,49" stroke="#0E7A70"/>
+        </g>
+      </svg>
+      <span>ER<i>relay</i></span>
+    </a>
+    <span class="sp"></span>
+    <a class="lnk" href="#how">How it works</a>
+    <a class="lnk" href="#limits">What it won't do</a>
+    <a class="btn sm" href="/app.html">Open the tool</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="shell">
+
+    <div>
+      <h1>The handoff report, assembled while you work.</h1>
+      <p class="lede">You enter fragments on a long transport. ERrelay puts them in the
+      order your receiving ED expects, reads back as a script you can say on the radio,
+      and tells you what you've left out.</p>
+      <div class="cta">
+        <a class="btn" href="/app.html">Open the tool</a>
+        <a class="btn ghost" href="#how">See how it works</a>
+      </div>
+      <p class="free">Free. Nothing to install.</p>
+    </div>
+
+    <div class="demo">
+      <div class="demo-head">
+        <b>Medic 14</b> · 64 M · chest pain
+        <span class="eta">ETA 18 min</span>
+      </div>
+
+      <div class="notes">
+        <div class="n"><span class="t">14:01</span><span class="x">64 m chest pain 40 min, at rest</span></div>
+        <div class="n"><span class="t">14:02</span><span class="x">bp 152/94 hr 104 rr 20 spo2 94</span></div>
+        <div class="n"><span class="t">14:03</span><span class="x">pressure, goes to L arm</span></div>
+        <div class="n"><span class="t">14:04</span><span class="x">hx htn, lisinopril, allergic pcn</span></div>
+        <div class="n"><span class="t">14:05</span><span class="x">asa 324 po</span></div>
+        <div class="n"><span class="t">14:06</span><span class="x">o2 2L nc</span></div>
+        <div class="n"><span class="t">14:08</span><span class="x">12 lead done, sent</span></div>
+      </div>
+
+      <div class="seam" aria-hidden="true">
+        <span class="ln"></span>
+        <svg viewBox="0 0 84 64" width="30" height="23">
+          <g fill="none" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6,15 22,32 6,49" stroke="#5E707D"/>
+            <polyline points="22,15 38,32 22,49" stroke="#5E707D"/>
+            <polyline points="62,15 78,32 62,49" stroke="#3FD3B8"/>
+          </g>
+        </svg>
+        <span class="ln"></span>
+      </div>
+
+      <div class="script">
+        <p>Medic 14 is en route code 2 with a 64-year-old male, alert and oriented,
+        coming from home with chest pain for 40 minutes that began at rest. Pressure,
+        radiating to the left arm. History of hypertension, takes lisinopril, allergic
+        to penicillin. Aspirin 324 milligrams by mouth at 14:05, oxygen 2 litres by
+        nasal cannula, 12-lead acquired and transmitted at 14:08. Pulse 104,
+        respirations 20, SpO2 94 on room air, BP 152 over 94. We are 18 minutes out,
+        <span class="q">any treatment concerns or questions?</span></p>
+      </div>
+
+      <div class="gapline">
+        <b>Not entered</b>
+        <span>GCS · blood sugar · home oxygen</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<section id="how">
+  <div class="shell">
+    <h2>Rural transports are long, and the radio report is rushed.</h2>
+    <div class="prose">
+      <p>On a long rural run the report to the receiving hospital gets made while the
+      crew is still treating the patient. It takes about thirty seconds to say, and the
+      ED uses it to have the right people and equipment waiting at the door.</p>
+      <p>The part that goes wrong usually isn't the connection. It's that something
+      gets left out because it didn't seem worth saying at the time, and the ED asks
+      for it after the patient is already through the doors. A rural EMS officer in
+      eastern Nebraska described exactly this when we asked him how his service
+      structures the call, and it changed what we built.</p>
+    </div>
+
+    <div class="does">
+      <div class="row">
+        <h3>Enter fragments as you go</h3>
+        <div>
+          <p>Short, out of order, in your own shorthand. The tool timestamps each one
+          so the sequence stays intact.</p>
+          <div class="eg">bp 148/96 &nbsp;·&nbsp; pelvic binder applied &nbsp;·&nbsp; hx dementia</div>
+        </div>
+      </div>
+      <div class="row">
+        <h3>Get it back in your order</h3>
+        <div>
+          <p>Unit and code, age and sex, mental status, where you came from, complaint
+          with onset, assessment findings, treatment, vitals with trends, ETA. Your
+          service's order, not a format someone else picked.</p>
+        </div>
+      </div>
+      <div class="row">
+        <h3>See what's missing before you key up</h3>
+        <div>
+          <p>The tool checks the report against the things an ED most often asks for
+          afterward and flags the gaps while you can still do something about them.</p>
+          <div class="eg"><em>Not entered</em> &nbsp;GCS · blood sugar · home oxygen · allergies</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="limits">
+  <div class="shell">
+    <h2>What it won't do.</h2>
+    <div class="prose">
+      <p>This is the part that matters most, so it's written down rather than buried
+      in a disclaimer.</p>
+    </div>
+    <div class="wont">
+      <ul>
+        <li><b>It doesn't diagnose.</b> No impressions, no differentials, no suggested
+        working diagnosis.</li>
+        <li><b>It doesn't advise on treatment.</b> It won't recommend an intervention,
+        question one you made, or flag a dose.</li>
+        <li><b>It doesn't add anything you didn't say.</b> A field with no data stays
+        empty and gets marked as not entered. It never fills a gap with a plausible
+        number.</li>
+        <li><b>It doesn't send on its own.</b> You read the report, you change anything
+        that's wrong, and nothing leaves the tablet until you approve it.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="shell">
+    <h2>Where this actually stands.</h2>
+    <div class="status">
+      <div>
+        <h3>It's a working prototype</h3>
+        <p>Not a finished product and not in service anywhere. It runs in a browser,
+        it works today, and it's being tested against synthetic cases to check that it
+        never invents information.</p>
+      </div>
+      <div>
+        <h3>Built in Omaha by two students</h3>
+        <p>Rewritten once already after a rural EMS officer explained how the report
+        actually works at his service. We'd rather be corrected early than be wrong
+        for a year.</p>
+      </div>
+      <div>
+        <h3>Free for rural and volunteer services</h3>
+        <p>Volunteer squads can't buy the commercial products in this space. That's
+        most of the reason this exists.</p>
+      </div>
+      <div>
+        <h3>We want to be told it's wrong</h3>
+        <p>If you run calls and the output doesn't match how your service does it,
+        that's the most useful thing you could tell us.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="close">
+  <div class="shell">
+    <h2>Try it with one of your own calls.</h2>
+    <p>Type in the fragments from a run you remember and see what comes back. It takes
+    about a minute, and there's nothing to sign up for.</p>
+    <div class="cta">
+      <a class="btn" href="/app.html">Open the tool</a>
+      <a class="btn ghost" href="mailto:errelayapp@gmail.com">Tell us what's wrong with it</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="shell">
+    <span>ERrelay · Omaha, Nebraska</span>
+    <span class="sp"></span>
+    <a href="/app.html">Open the tool</a>
+    <a href="mailto:errelayapp@gmail.com">Contact</a>
+  </div>
+</footer>
+
+</body>
+</html>
